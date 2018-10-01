@@ -1,0 +1,23 @@
+.axis path,
+.axis line {
+	fill: none;
+	stroke: #000;
+	stroke-width: 1px;
+	shape-rendering: crispEdges;
+}
+/*.x.axis path {
+        display: none;
+    }*/
+.prob-rect {
+	fill: steelblue;
+	stroke: steelblue;
+	stroke-width: 3px;
+}
+.line {
+	fill: none;
+	stroke: steelblue;
+	stroke-width: 3px;
+}
+.area {
+	fill: lightsteelblue;
+}
