@@ -20,10 +20,11 @@ export class Outbreak {
 		this.index = {
 			onset: 0,
 			level: 0,
+			contactEvents: false,
 		};
 		this.caseList = [...this.preorder()];
 		this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
-		this.caseList.forEach((n, index) => (n.id = `case ${index}`));
+		this.caseList.forEach((n, index) => (n.Id = `case ${index}`));
 
 		this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
 	}

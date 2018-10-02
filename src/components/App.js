@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import seedrandom from 'seedrandom';
 import Selectors from './Selectors';
 import SerialInterval from './SerialInterval';
 import NumberofTransmissions from './NumberofTransmissions';
@@ -25,14 +26,14 @@ class App extends Component {
 			transmissionOptions: ['Gamma', 'LogNormal'],
 			transmissionSelection: 'Gamma',
 			transmissionParameters: [1, 1.1],
-			randomSeed: 43,
-			addDays: 0,
+			randomSeed: 111,
+			addDays: 11,
 			transmissionTree: new Outbreak(),
 		};
 	}
 	onHover(d) {
 		//for the tree
-		this.setState({ hover: d.id });
+		this.setState({ hover: d.Id });
 	}
 	offHover(d) {
 		this.setState({ hover: 'none' });
@@ -51,13 +52,22 @@ class App extends Component {
 	}
 
 	updateOutbreak() {
+		// set random seed if this is the first call
+		if (
+			(this.state.transmissionTree.caseList.length === 1) &
+			(this.state.transmissionTree.index.contactEvents === false)
+		) {
+			seedrandom(this.state.randomSeed, { global: true });
+		}
 		const R0 = sampleDistribution[this.state.transmissionSelection];
 		const serialInterval = sampleDistribution[this.state.distributionSelection];
 		const newTree = this.state.transmissionTree;
+
 		newTree.epiParams = {
 			R0: () => R0(...this.state.transmissionParameters),
 			serialInterval: () => serialInterval(...this.state.distributionParameters),
 		};
+
 		let currentTime = newTree.caseList.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
 		const targetTime = currentTime + this.state.addDays;
 		while ((currentTime < targetTime) & (newTree.caseList.filter(x => !x.children).length > 0)) {
@@ -65,7 +75,6 @@ class App extends Component {
 			currentTime = newTree.caseList.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
 		}
 		this.setState({ transmissionTree: newTree });
-		console.log(newTree);
 	}
 	reset() {
 		this.setState({ transmissionTree: new Outbreak() });
