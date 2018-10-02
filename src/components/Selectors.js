@@ -154,7 +154,8 @@ const Selectors = props => {
 				<label>Days to add to current outbreak</label>
 				<InputBox placeHolder={1} updater={props.updater} value={props.addDays} stateKey={'addDays'} />
 			</div>
-			<button>Run Outbreak</button>
+			<button onClick={props.buttonAction}>Run Outbreak</button>
+			<button onClick={props.reset}>Reset</button>
 		</div>
 	);
 };
