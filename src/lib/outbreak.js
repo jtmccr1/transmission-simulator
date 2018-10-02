@@ -23,6 +23,8 @@ export class Outbreak {
 		};
 		this.caseList = [...this.preorder()];
 		this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
+		this.caseList.forEach((n, index) => (n.id = `case ${index}`));
+
 		this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
 	}
 	/**
@@ -116,6 +118,7 @@ export class Outbreak {
 
 		if (numberOftransmissions > 0) {
 			donor.children = [];
+			donor.contactEvents = true;
 		}
 		for (let i = 1; i < numberOftransmissions; i++) {
 			const child = {
@@ -134,7 +137,7 @@ export class Outbreak {
 	 * @param levels - the number of levels to add to the growing transmission chain.
 	 */
 	spread() {
-		this.caseList.filter(x => !x.children).map(node => this.transmit(node, this.epiParams));
+		this.caseList.filter(x => !x.contactEvents).map(node => this.transmit(node, this.epiParams));
 		this.update();
 	}
 	// 	let currentTime = this.cases.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);

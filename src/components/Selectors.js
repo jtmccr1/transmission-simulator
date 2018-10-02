@@ -146,10 +146,10 @@ const Selectors = props => {
 			</select>
 			<div>{transmissionSliders}</div>
 			<h3>Simulate Transmission</h3>
-			<div>
+			{/*<div>
 				<label>Set Random Seed</label>
 				<InputBox placeHolder={43} updater={props.updater} value={props.randomSeed} stateKey={'randomSeed'} />
-			</div>
+			</div>*/}
 			<div>
 				<label>Days to add to current outbreak</label>
 				<InputBox placeHolder={1} updater={props.updater} value={props.addDays} stateKey={'addDays'} />

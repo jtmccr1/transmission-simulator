@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import Selectors from './Selectors';
 import SerialInterval from './SerialInterval';
 import NumberofTransmissions from './NumberofTransmissions';
+import Transmission from './TransmissionNetwork';
+import LineList from './LineList';
+import EpidemicContainer from './EpidemicContainer';
 import { pdfFunctions, meanFunctions, sampleDistribution } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
@@ -11,8 +14,11 @@ class App extends Component {
 		super(props);
 		this.updateOnSelection = this.updateOnSelection.bind(this);
 		this.updateOutbreak = this.updateOutbreak.bind(this);
+		this.onHover = this.onHover.bind(this);
+		this.offHover = this.offHover.bind(this);
 		this.reset = this.reset.bind(this);
 		this.state = {
+			hover: 'none',
 			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
 			distributionParameters: [1.5, 3],
@@ -23,6 +29,13 @@ class App extends Component {
 			addDays: 0,
 			transmissionTree: new Outbreak(),
 		};
+	}
+	onHover(d) {
+		//for the tree
+		this.setState({ hover: d.id });
+	}
+	offHover(d) {
+		this.setState({ hover: 'none' });
 	}
 	updateOnSelection(key, index, event, numeric = true) {
 		let newState = {};
@@ -45,9 +58,14 @@ class App extends Component {
 			R0: () => R0(...this.state.transmissionParameters),
 			serialInterval: () => serialInterval(...this.state.distributionParameters),
 		};
-		newTree.spread();
+		let currentTime = newTree.caseList.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
+		const targetTime = currentTime + this.state.addDays;
+		while ((currentTime < targetTime) & (newTree.caseList.filter(x => !x.children).length > 0)) {
+			newTree.spread();
+			currentTime = newTree.caseList.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
+		}
 		this.setState({ transmissionTree: newTree });
-		console.log(this.state.transmissionTree);
+		console.log(newTree);
 	}
 	reset() {
 		this.setState({ transmissionTree: new Outbreak() });
@@ -90,6 +108,37 @@ class App extends Component {
 							meanFunction={meanFunctions[this.state.transmissionSelection]}
 						/>
 					</div>
+				</div>
+				{this.state.transmissionTree.caseList.length > 1 ? (
+					<div className="container">
+						<div>
+							<h1>Transmission tree</h1>
+							<Transmission
+								hoverElement={this.state.hover}
+								onHover={this.onHover}
+								offHover={this.offHover}
+								size={[700, 500]}
+								data={this.state.transmissionTree.caseList}
+							/>
+						</div>
+						<div>
+							<h1>EpiCurve</h1>
+							<EpidemicContainer
+								data={this.state.transmissionTree.caseList}
+								hoverElement={this.state.hover}
+								selectedElement={this.state.selected}
+								onHover={this.onHover}
+								offHover={this.offHover}
+								size={[700, 500]}
+								title={'Epidemic Curve'}
+							/>
+						</div>
+					</div>
+				) : (
+					<div />
+				)}
+				<div className="container">
+					<LineList data={this.state.transmissionTree.caseList} />
 				</div>
 			</div>
 		);
