@@ -119,7 +119,7 @@ export class Outbreak {
 	 * @returns {*}
 	 */
 	get externalCases() {
-		return this.cases.filter(node => node.children);
+		return this.cases.filter(node => !node.children || node.children.length === 0);
 	}
 	/**
 	 * Returns transmitted cases from a donor case

@@ -13,22 +13,44 @@ class TransmissionNetworkTree extends React.Component {
 		this.drawTransPlot();
 	}
 	drawTransPlot() {
+		function positionNodes(tree) {
+			// external nodes get assigned height in 0-1.
+			// external nodes are taken from the nodelist which is preorder traversal
+			const numberOfExternalNodes = tree.externalCases.length;
+			// Here we get the order based on a current traversal
+			const externalNodes = tree.externalCases.sort((a, b) => {
+				let postOrder = [...tree.postorder()];
+				return postOrder.indexOf(a) - postOrder.indexOf(b);
+			});
+
+			for (const [i, node] of externalNodes.entries()) {
+				//  x and y are in [0,1]
+				node.y = i / numberOfExternalNodes; // Other axis width?
+			}
+			// internal nodes get the mean height of their childern
+			for (const node of [...tree.postorder()]) {
+				if (node.children && node.children.length > 0) {
+					node.y = d3.mean(node.children, kid => kid.y);
+				}
+			}
+		}
+		positionNodes(this.props.Outbreak);
 		const node = this.node;
 		const width = this.props.size[0];
 		const height = this.props.size[1];
 		const svg = d3.select(node).style('font', '10px sans-serif');
 		// get space not effient
-		const that = this;
-		this.props.data.forEach(d => {
-			const offspring = [...that.props.Outbreak.preorder(d)].length - 1;
-			const neices = that.props.data
-				.filter(node => node.level === d.level)
-				.map(node => [...that.props.Outbreak.preorder(node)].length - 1)
-				.reduce((acc, curr) => acc + curr, 0);
-			const proportion = offspring / neices;
-			d.y = proportion * 0.5;
-		});
-
+		// const that = this;
+		// this.props.data.forEach(d => {
+		// 	const offspring = [...that.props.Outbreak.preorder(d)].length - 1;
+		// 	const neices = that.props.data
+		// 		.filter(node => node.level === d.level)
+		// 		.map(node => [...that.props.Outbreak.preorder(node)].length - 1)
+		// 		.reduce((acc, curr) => acc + curr, 0);
+		// 	const proportion = offspring / neices;
+		// 	d.y = proportion * 0.5;
+		// });
+		const processedData = this.props.Outbreak.caseList;
 		//const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent, target: d }));
 		const yScale = d3
 			.scaleLinear()
@@ -37,7 +59,7 @@ class TransmissionNetworkTree extends React.Component {
 		const xScale = d3
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(this.props.data, d => d.onset)]);
+			.domain([0, d3.max(processedData, d => d.onset)]);
 
 		const makeLinePath = d3
 			.line()
@@ -55,7 +77,7 @@ class TransmissionNetworkTree extends React.Component {
 		svgGroup
 			.selectAll('.line')
 			.data(
-				this.props.data.filter(n => n.parent).map(n => {
+				processedData.filter(n => n.parent).map(n => {
 					return {
 						target: n,
 						values: [{ onset: n.parent.onset, y: n.parent.y }, { onset: n.onset, y: n.y }],
@@ -73,7 +95,7 @@ class TransmissionNetworkTree extends React.Component {
 		//Create nodes as circles
 		svgGroup
 			.selectAll('circle')
-			.data(this.props.data)
+			.data(processedData)
 			.enter()
 			.append('circle');
 
