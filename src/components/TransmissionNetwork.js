@@ -14,7 +14,8 @@ class Transmission extends React.Component {
 	}
 	drawTransPlot() {
 		const node = this.node;
-		const padding = 100;
+		const svg = d3.select(node).style('font', '10px sans-serif');
+
 		const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent.Id, target: d.Id }));
 		// const xScale = d3
 		// 	.scaleTime()
@@ -35,13 +36,6 @@ class Transmission extends React.Component {
 					.strength(0.2)
 			)
 			.force('charge', d3.forceManyBody().strength(-50))
-			// .force(
-			// 	'center',
-			// 	d3
-			// 		.forceCenter()
-			// 		.x((this.props.size[0] - padding) / 2)
-			// 		.y((this.props.size[1] - padding) / 2)
-			// )
 			.force(
 				'forceX',
 				d3
@@ -57,10 +51,14 @@ class Transmission extends React.Component {
 					.y(this.props.size[1] * 0.4)
 			);
 
+		//remove current plot
+		svg.selectAll('g').remove();
+		svg.append('g').attr('transform', `translate(${this.props.margin.left},${this.props.margin.top})`);
+
+		const svgGroup = svg.select('g');
 		//Create SVG element
 		//Create edges as lines
-		const edgesSVG = d3
-			.select(node)
+		const edgesSVG = svgGroup
 			.selectAll('line')
 			.data(edges)
 			.enter()
@@ -69,8 +67,7 @@ class Transmission extends React.Component {
 			.style('stroke-width', 1);
 
 		//Create nodes as circles
-		const nodesSVG = d3
-			.select(node)
+		const nodesSVG = svgGroup
 			.selectAll('circle')
 			.data(this.props.data)
 			.enter()
@@ -78,7 +75,7 @@ class Transmission extends React.Component {
 			.on('mouseover', this.props.onHover)
 			.on('mouseout', this.props.offHover);
 
-		d3.select(node)
+		svgGroup
 			.selectAll('circle')
 			.attr('id', d => d.Id)
 			.attr('r', 10)
@@ -90,37 +87,9 @@ class Transmission extends React.Component {
 				}
 			});
 
-		//Add a simple tooltip
-		// nodesSVG.append('title').text(function(d) {
-		// 	return d.id;
-		// });
-
-		//Axis
-
-		// const xAxis = d3
-		// 	.axisBottom()
-		// 	.scale(xScale)
-		// 	.ticks(d3.timeDay)
-		// 	.tickFormat(d3.timeFormat('%d-%b'));
-
-		// d3.selectAll('.xAxis').remove();
-
-		// d3.select(node)
-		// 	.append('g')
-		// 	.attr('class', 'xAxis')
-		// 	.attr('transform', `translate(0, ${this.props.size[1] - padding})`)
-		// 	.call(xAxis)
-		// 	.selectAll('text')
-		// 	.attr('y', 10)
-		// 	.attr('x', 8)
-		// 	.attr('dy', '.35em')
-		// 	.attr('transform', 'rotate(45)')
-		// 	.style('text-anchor', 'start');
-		//Every time the simulation "ticks", this will be called
 		simulation.nodes(this.props.data).on('tick', ticked);
 
 		simulation.force('link').links(edges);
-		const that = this;
 		function ticked() {
 			edgesSVG
 				.attr('x1', function(d) {

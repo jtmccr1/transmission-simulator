@@ -70,7 +70,7 @@ class EpidemicContainer extends React.Component {
 		const xRadius = (xScale(bins[0].x1) - xScale(bins[0].x0)) / 2;
 		const maxPile = bins.reduce((acc, cur) => Math.max(acc, cur.length), 0);
 		const yRadius = (this.props.size[1] - padding) / (maxPile * 2); //*2 for radius not diameter
-		const radius = Math.min(xRadius, yRadius);
+		const radius = Math.min(10, Math.min(xRadius, yRadius));
 		// d3.select(node)
 		// 	.selectAll('circle')
 		// 	.data(this.props.data)

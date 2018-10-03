@@ -28,8 +28,10 @@ class App extends Component {
 			transmissionSelection: 'NegativeBinomial',
 			transmissionParameters: [2, 0.5],
 			randomSeed: 55,
-			addDays: 10,
+			addDays: 100,
 			transmissionTree: new Outbreak(),
+			time: 0,
+			cases: [],
 		};
 	}
 	onHover(d) {
@@ -71,16 +73,20 @@ class App extends Component {
 			serialInterval: () => serialInterval(...this.state.distributionParameters),
 		};
 
-		let currentTime = newTree.caseList.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
+		let currentTime = this.state.time;
 		const targetTime = currentTime + this.state.addDays;
 		while ((currentTime < targetTime) & (newTree.caseList.filter(x => !x.children).length > 0)) {
 			newTree.spread();
 			currentTime = newTree.caseList.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
 		}
-		this.setState({ transmissionTree: newTree });
+		this.setState({
+			transmissionTree: newTree,
+			time: targetTime,
+			cases: newTree.caseList.filter(x => x.onset <= targetTime),
+		});
 	}
 	reset() {
-		this.setState({ transmissionTree: new Outbreak() });
+		this.setState({ transmissionTree: new Outbreak(), time: 0, cases: [] });
 	}
 
 	render() {
@@ -101,7 +107,8 @@ class App extends Component {
 							addDays={this.state.addDays}
 							buttonAction={this.updateOutbreak}
 							reset={this.reset}
-							data={this.state.transmissionTree.caseList}
+							data={this.state.cases}
+							time={this.state.time}
 						/>
 					</div>
 					<div>
@@ -126,13 +133,13 @@ class App extends Component {
 						<div className="inner">
 							<h1>EpiCurve</h1>
 							<EpidemicContainer
-								data={this.state.transmissionTree.caseList}
+								data={this.state.cases}
 								hoverElement={this.state.hover}
 								selectedElement={this.state.selected}
 								onHover={this.onHover}
 								offHover={this.offHover}
 								size={[1500, 800]}
-								title={'Epidemic Curve'}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 							/>
 						</div>
 						<div>
@@ -142,8 +149,9 @@ class App extends Component {
 									hoverElement={this.state.hover}
 									onHover={this.onHover}
 									offHover={this.offHover}
-									size={[700, 500]}
-									data={this.state.transmissionTree.caseList}
+									size={[1500, 800]}
+									data={this.state.cases}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								/>
 							</div>
 						</div>
@@ -152,7 +160,7 @@ class App extends Component {
 					<div />
 				)}
 				<div className="inner">
-					<LineList data={this.state.transmissionTree.caseList} />
+					<LineList data={this.state.cases} />
 				</div>
 			</div>
 		);

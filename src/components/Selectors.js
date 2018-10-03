@@ -121,7 +121,7 @@ const Selectors = props => {
 		], */
 		NegativeBinomial: [
 			{
-				min: 0.1,
+				min: 1,
 				max: 10,
 				step: 0.1,
 				name: 'r',
@@ -182,9 +182,7 @@ const Selectors = props => {
 			</div>
 			<button onClick={props.buttonAction}>Run Outbreak</button>
 			<button onClick={props.reset}>Reset</button>
-			<h4>{`Status: ${status} (${props.data
-				.reduce((max, curr) => Math.max(max, curr.onset), 0)
-				.toFixed(2)} days)`}</h4>
+			<h4>{`Status: ${status} (${props.time} days)`}</h4>
 			<h4>{`Cases: ${props.data.length} (${activeInfections} active cases)`}</h4>
 			<h4>{`Status: ${status}`}</h4>
 		</div>
