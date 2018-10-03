@@ -18,8 +18,8 @@ class TransmissionNetworkTree extends React.Component {
 			// external nodes are taken from the nodelist which is preorder traversal
 			const numberOfExternalNodes = tree.externalCases.length;
 			// Here we get the order based on a current traversal
+			let postOrder = [...tree.postorder()];
 			const externalNodes = tree.externalCases.sort((a, b) => {
-				let postOrder = [...tree.postorder()];
 				return postOrder.indexOf(a) - postOrder.indexOf(b);
 			});
 
