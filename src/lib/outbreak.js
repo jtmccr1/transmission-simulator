@@ -22,7 +22,7 @@ export class Outbreak {
 			level: 0,
 			contactEvents: false,
 		};
-		this.caseList = [...this.preorder()];
+		this.caseList = this.broadSearch();
 		this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
 		this.caseList.forEach((n, index) => (n.Id = `case ${index}`));
 
@@ -98,6 +98,21 @@ export class Outbreak {
 		return [...this.caseList];
 	}
 
+	broadSearch() {
+		let q = [this.index];
+		let visited = [];
+		while (q.length > 0) {
+			const v = q.shift();
+			visited.push(v);
+			if (v.children) {
+				for (const child of v.children) {
+					q.push(child);
+				}
+			}
+		}
+		return visited;
+	}
+
 	/**
 	 * Gets an array containing all the external node objects
 	 * This is borrowed from figtree.js c- Andrew Rambaut.
@@ -138,26 +153,4 @@ export class Outbreak {
 		this.caseList.filter(x => !x.contactEvents).map(node => this.transmit(node, this.epiParams));
 		this.update();
 	}
-	// 	let currentTime = this.cases.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
-	// 	// let currentLevel = this.cases.map(node => node.level).reduce((max, cur) => Math.max(max, cur), -Infinity);
-	// 	const targetTime = currentTime + days;
-
-	// 	while (currentTime < targetTime) {
-	// 		// each node only gets one chance to transmit. Get those elible.
-
-	// 		const possibleDonors = this.cases.filter(x => !x.children);
-
-	// 		if (possibleDonors.length === 0) {
-	// 			break;
-	// 		}
-	// 		for (const donor of possibleDonors) {
-	// 			this.transmit(donor, this.epiParams);
-	// 		}
-	// 		this.update();
-	// 		// currentLevel = +1;
-	// 		currentTime = this.cases.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
-	// 	}
-	// 	// remove cases that happen after the provided date. They will stay as children nodes.
-	// 	//this.caseList = this.caseList.filter(c => c.onset < targetTime);
-	// }
 }
