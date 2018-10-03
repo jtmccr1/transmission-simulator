@@ -21,7 +21,7 @@ class NumberofTransmissions extends React.Component {
 		//Helper functions
 
 		//This will be a negative binomial distribution
-		const curriedPdf = R.curry(this.props.pdf);
+		const curriedPdf = R.curry(jStat.negbin.pdf);
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -29,13 +29,18 @@ class NumberofTransmissions extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = getData(curriedPdf(R.__, ...this.props.params), 0.01).filter(d => isFinite(d.p));
+		const data = getData(curriedPdf(R.__, ...this.props.params), 1, 0.01, 0).filter(d => isFinite(d.p));
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
-			.scaleLinear()
+			.scaleBand()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(data, d => d.q)]);
+			.padding(0.1)
+			.domain(
+				data.map(function(d) {
+					return d.q;
+				})
+			);
 
 		const yScale = d3
 			.scaleLinear()
@@ -69,18 +74,20 @@ class NumberofTransmissions extends React.Component {
 		);
 
 		svgGroup
-			.append('path')
-			.datum(data, d => d.q)
-			.attr('class', 'area')
-			.attr('d', area);
-		svgGroup
-			.append('path')
-			.datum(data)
-			.attr('class', 'line')
-			.attr('d', makeLinePath);
+			.selectAll('rect')
+			.data(data)
+			.enter()
+			.append('rect')
+			.attr('class', 'prob-rect')
+			.attr('x', d => xScale(d.q))
+			.attr('width', xScale.bandwidth())
+			.attr('y', d => yScale(d.p))
+			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.p));
 	}
 	render() {
-		const mean = this.props.meanFunction(...this.props.params);
+		const r = this.props.params[0];
+		const p = this.props.params[1];
+		const mean = (r * p) / (1 - p);
 		return (
 			<div>
 				<div>{`Number of transmissions/infection (Expectation: ${Number(mean).toFixed(2)})`}</div>

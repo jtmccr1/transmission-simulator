@@ -6,7 +6,7 @@ import NumberofTransmissions from './NumberofTransmissions';
 import Transmission from './TransmissionNetwork';
 import LineList from './LineList';
 import EpidemicContainer from './EpidemicContainer';
-import { pdfFunctions, meanFunctions, sampleDistribution } from '../lib/commonFunctions';
+import { pdfFunctions, sampleDistribution, negbinSample } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
@@ -23,11 +23,12 @@ class App extends Component {
 			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
 			distributionParameters: [1.5, 3],
-			transmissionOptions: ['Gamma', 'LogNormal'],
-			transmissionSelection: 'Gamma',
-			transmissionParameters: [1, 1.1],
-			randomSeed: 111,
-			addDays: 11,
+			//transmissionOptions: ['Gamma', 'LogNormal'],
+			transmissionOptions: ['NegativeBinomial'],
+			transmissionSelection: 'NegativeBinomial',
+			transmissionParameters: [2, 0.5],
+			randomSeed: 55,
+			addDays: 10,
 			transmissionTree: new Outbreak(),
 		};
 	}
@@ -53,18 +54,20 @@ class App extends Component {
 
 	updateOutbreak() {
 		// set random seed if this is the first call
+		console.log(sampleDistribution);
 		if (
 			(this.state.transmissionTree.caseList.length === 1) &
 			(this.state.transmissionTree.index.contactEvents === false)
 		) {
 			seedrandom(this.state.randomSeed, { global: true });
 		}
-		const R0 = sampleDistribution[this.state.transmissionSelection];
+		//const R = sampleDistribution[this.state.transmissionSelection];
+		const R = negbinSample;
 		const serialInterval = sampleDistribution[this.state.distributionSelection];
 		const newTree = this.state.transmissionTree;
 
 		newTree.epiParams = {
-			R0: () => R0(...this.state.transmissionParameters),
+			R0: () => R(...this.state.transmissionParameters),
 			serialInterval: () => serialInterval(...this.state.distributionParameters),
 		};
 
@@ -114,7 +117,6 @@ class App extends Component {
 							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 							params={this.state.transmissionParameters}
 							pdf={pdfFunctions[this.state.transmissionSelection]}
-							meanFunction={meanFunctions[this.state.transmissionSelection]}
 						/>
 					</div>
 				</div>

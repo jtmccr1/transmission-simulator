@@ -31,11 +31,11 @@ class EpidemicContainer extends React.Component {
 		// 	.value(d => d['onset'])
 		// 	.domain(xScale.domain());
 
-		const ticks = xScale.domain()[1] > 30 ? Math.floor(xScale.domain()[1] / 7) : 10;
+		//const ticks = xScale.domain()[1] > 30 ? Math.floor(xScale.domain()[1] / 7) : 10;
 		const bins = d3
 			.histogram()
 			.domain(xScale.domain())
-			.thresholds(xScale.ticks(ticks))
+			.thresholds(xScale.ticks(10))
 			.value(d => d.onset)(this.props.data);
 
 		d3.select(node)

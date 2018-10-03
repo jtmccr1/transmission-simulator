@@ -115,13 +115,10 @@ export class Outbreak {
 	 */
 	transmit(donor, epiParameters) {
 		// How many transmissions with this case have
-		const numberOftransmissions = Math.floor(epiParameters.R0());
-
-		if (numberOftransmissions > 0) {
-			donor.children = [];
-			donor.contactEvents = true;
-		}
-		for (let i = 1; i < numberOftransmissions; i++) {
+		const numberOftransmissions = epiParameters.R0();
+		donor.children = [];
+		donor.contactEvents = true;
+		for (let i = 1; i <= numberOftransmissions; i++) {
 			const child = {
 				parent: donor,
 				level: donor.level + 1,

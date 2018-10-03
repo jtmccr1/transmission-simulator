@@ -71,7 +71,7 @@ const Selectors = props => {
 	));
 
 	const transmissionSlidersOptions = {
-		LogNormal: [
+		/* LogNormal: [
 			{
 				min: 0.002,
 				max: 5,
@@ -113,6 +113,30 @@ const Selectors = props => {
 				step: 0.1,
 				name: 'scale',
 				label: `scale: ${props.transmissionParameters[1]}`,
+				value: props.transmissionParameters[1],
+				updater: props.updater,
+				stateKey: 'transmissionParameters',
+				index: 1,
+			},
+		], */
+		NegativeBinomial: [
+			{
+				min: 0.1,
+				max: 10,
+				step: 0.1,
+				name: 'r',
+				label: `r: ${props.transmissionParameters[0]}`,
+				value: props.transmissionParameters[0],
+				updater: props.updater,
+				stateKey: 'transmissionParameters',
+				index: 0,
+			},
+			{
+				min: 0.01,
+				max: 1,
+				step: 0.01,
+				name: 'p',
+				label: `p: ${props.transmissionParameters[1]}`,
 				value: props.transmissionParameters[1],
 				updater: props.updater,
 				stateKey: 'transmissionParameters',

@@ -13,11 +13,9 @@ export const cdfFunctions = {
 export const sampleDistribution = {
 	LogNormal: jStat.lognormal.sample,
 	Gamma: jStat.gamma.sample,
+	NegativeBinomial: negbinSample,
 };
-export const meanFunctions = {
-	LogNormal: jStat.lognormal.mean,
-	Gamma: jStat.gamma.mean,
-};
+
 // from http://bl.ocks.org/mbostock/4349187 from https://github.com/rambaut/Probability-of-Difference/blob/gh-pages/index.html
 // Sample from a normal distribution with mean 0, stddev 1.
 export const getData = (curriedF, xStep = 1, minP = 0.001, initial = 0) => {
@@ -72,4 +70,25 @@ export const drawAxis = (svgGroup, xScale, yScale, size, margins, xlab, ylab) =>
 		.attr('dy', '1em')
 		.style('text-anchor', 'middle')
 		.text(ylab);
+};
+
+//By d. Knuth ref : https://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables
+export const poissonSample = lamda => {
+	let L = Math.exp(-lamda);
+	let k = 0;
+	let p = 1;
+	while (p > L) {
+		k++;
+		const u = Math.random();
+		p = u * p;
+	}
+	return k - 1;
+};
+
+export const negbinSample = (r, p) => {
+	//sample lamda from gamma dist\
+	const lamda = jStat.gamma.sample(r, p);
+	//sample from poisson
+	const sample = poissonSample(lamda);
+	return sample;
 };
