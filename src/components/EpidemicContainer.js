@@ -17,7 +17,6 @@ class EpidemicContainer extends React.Component {
 	}
 
 	drawEpiPlot() {
-		console.log('here');
 		const node = this.node;
 		const padding = 100;
 		const xScale = d3

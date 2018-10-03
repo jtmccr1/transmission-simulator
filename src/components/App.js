@@ -3,7 +3,7 @@ import seedrandom from 'seedrandom';
 import Selectors from './Selectors';
 import SerialInterval from './SerialInterval';
 import NumberofTransmissions from './NumberofTransmissions';
-import Transmission from './TransmissionNetwork';
+import TransmissionNetworkTree from './TransmissionFixedNetwork';
 import LineList from './LineList';
 import EpidemicContainer from './EpidemicContainer';
 import { pdfFunctions, sampleDistribution, negbinSample } from '../lib/commonFunctions';
@@ -56,7 +56,6 @@ class App extends Component {
 
 	updateOutbreak() {
 		// set random seed if this is the first call
-		console.log(sampleDistribution);
 		if (
 			(this.state.transmissionTree.caseList.length === 1) &
 			(this.state.transmissionTree.index.contactEvents === false)
@@ -145,12 +144,13 @@ class App extends Component {
 						<div>
 							<div className="inner">
 								<h1>Transmission tree</h1>
-								<Transmission
+								<TransmissionNetworkTree
 									hoverElement={this.state.hover}
 									onHover={this.onHover}
 									offHover={this.offHover}
 									size={[1500, 800]}
 									data={this.state.cases}
+									Outbreak={this.state.transmissionTree}
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								/>
 							</div>

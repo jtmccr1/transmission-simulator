@@ -184,7 +184,6 @@ const Selectors = props => {
 			<button onClick={props.reset}>Reset</button>
 			<h4>{`Status: ${status} (${props.time} days)`}</h4>
 			<h4>{`Cases: ${props.data.length} (${activeInfections} active cases)`}</h4>
-			<h4>{`Status: ${status}`}</h4>
 		</div>
 	);
 };

@@ -64,7 +64,7 @@ export class Outbreak {
 	 * This is borrowed from figtree.js c- Andrew Rambaut.
 	 * @returns {IterableIterator<IterableIterator<*|*>>}
 	 */
-	*postorder() {
+	*postorder(startNode = this.index) {
 		const traverse = function*(node) {
 			if (node.children) {
 				for (const child of node.children) {
@@ -74,7 +74,7 @@ export class Outbreak {
 			yield node;
 		};
 
-		yield* traverse(this.index);
+		yield* traverse(startNode);
 	}
 
 	/**
@@ -82,7 +82,7 @@ export class Outbreak {
 	 * This is borrowed from figtree.js c- Andrew Rambaut.
 	 * @returns {IterableIterator<IterableIterator<*|*>>}
 	 */
-	*preorder() {
+	*preorder(startNode = this.index) {
 		const traverse = function*(node) {
 			yield node;
 			if (node.children) {
@@ -92,14 +92,14 @@ export class Outbreak {
 			}
 		};
 
-		yield* traverse(this.index);
+		yield* traverse(startNode);
 	}
 	get cases() {
 		return [...this.caseList];
 	}
 
-	broadSearch() {
-		let q = [this.index];
+	broadSearch(startNode = this.index) {
+		let q = [startNode];
 		let visited = [];
 		while (q.length > 0) {
 			const v = q.shift();
