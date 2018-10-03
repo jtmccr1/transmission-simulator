@@ -42,3 +42,9 @@
 .container > div {
 	flex-grow: 1; /*grow*/
 }
+
+.inner {
+	display: table;
+	margin: 0 auto;
+	text-align: center;
+}

@@ -51,12 +51,10 @@ class LineList extends Component {
 			sortName: 'onset',
 			sortOrder: 'asec',
 		};
-		const status = this.props.data.filter(x => x.contactEvents).length === dataSet.length ? 'Ended' : 'On going';
 
 		return (
 			<div>
 				<h2> {`Line List ( ${dataSet.length} cases) `} </h2>
-				<h4>{`Status: ${status}`}</h4>
 				<BootstrapTable data={dataSet} striped hover>
 					<TableHeaderColumn isKey dataField="Id" dataSort width="100" {...textColumn}>
 						Id

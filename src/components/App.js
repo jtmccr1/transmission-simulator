@@ -101,6 +101,7 @@ class App extends Component {
 							addDays={this.state.addDays}
 							buttonAction={this.updateOutbreak}
 							reset={this.reset}
+							data={this.state.transmissionTree.caseList}
 						/>
 					</div>
 					<div>
@@ -121,18 +122,8 @@ class App extends Component {
 					</div>
 				</div>
 				{this.state.transmissionTree.caseList.length > 1 ? (
-					<div className="container">
-						<div>
-							<h1>Transmission tree</h1>
-							<Transmission
-								hoverElement={this.state.hover}
-								onHover={this.onHover}
-								offHover={this.offHover}
-								size={[700, 500]}
-								data={this.state.transmissionTree.caseList}
-							/>
-						</div>
-						<div>
+					<div>
+						<div className="inner">
 							<h1>EpiCurve</h1>
 							<EpidemicContainer
 								data={this.state.transmissionTree.caseList}
@@ -140,15 +131,27 @@ class App extends Component {
 								selectedElement={this.state.selected}
 								onHover={this.onHover}
 								offHover={this.offHover}
-								size={[700, 500]}
+								size={[1500, 800]}
 								title={'Epidemic Curve'}
 							/>
+						</div>
+						<div>
+							<div className="inner">
+								<h1>Transmission tree</h1>
+								<Transmission
+									hoverElement={this.state.hover}
+									onHover={this.onHover}
+									offHover={this.offHover}
+									size={[700, 500]}
+									data={this.state.transmissionTree.caseList}
+								/>
+							</div>
 						</div>
 					</div>
 				) : (
 					<div />
 				)}
-				<div className="container">
+				<div className="inner">
 					<LineList data={this.state.transmissionTree.caseList} />
 				</div>
 			</div>

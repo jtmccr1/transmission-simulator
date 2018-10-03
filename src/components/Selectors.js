@@ -148,6 +148,8 @@ const Selectors = props => {
 	const transmissionSliders = transmissionSlidersOptions[props.transmissionSelection].map((x, i) => (
 		<Sliderselector {...x} key={i} />
 	));
+	const activeInfections = props.data.filter(x => !x.contactEvents).length;
+	const status = activeInfections === 0 ? 'Ended' : 'On going';
 
 	return (
 		<div>
@@ -180,6 +182,11 @@ const Selectors = props => {
 			</div>
 			<button onClick={props.buttonAction}>Run Outbreak</button>
 			<button onClick={props.reset}>Reset</button>
+			<h4>{`Status: ${status} (${props.data
+				.reduce((max, curr) => Math.max(max, curr.onset), 0)
+				.toFixed(2)} days)`}</h4>
+			<h4>{`Cases: ${props.data.length} (${activeInfections} active cases)`}</h4>
+			<h4>{`Status: ${status}`}</h4>
 		</div>
 	);
 };
