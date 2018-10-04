@@ -9,7 +9,10 @@ export const cdfFunctions = {
 	LogNormal: jStat.lognormal.cdf,
 	Gamma: jStat.gamma.cdf,
 };
-
+export const meanFunctions = {
+	LogNormal: jStat.lognormal.mean,
+	Gamma: jStat.gamma.mean,
+};
 export const sampleDistribution = {
 	LogNormal: jStat.lognormal.sample,
 	Gamma: jStat.gamma.sample,
@@ -87,7 +90,7 @@ export const poissonSample = lamda => {
 
 export const negbinSample = (r, p) => {
 	//sample lamda from gamma dist\
-	const lamda = jStat.gamma.sample(r, p);
+	const lamda = jStat.gamma.sample(r, 1 - p);
 	//sample from poisson
 	const sample = poissonSample(lamda);
 	return sample;

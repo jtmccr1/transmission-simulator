@@ -3,10 +3,12 @@ import seedrandom from 'seedrandom';
 import Selectors from './Selectors';
 import SerialInterval from './SerialInterval';
 import NumberofTransmissions from './NumberofTransmissions';
+import SerialIntervalTest from './SerialIntervalTest';
+import NumberofTransmissionsTest from './NumberofTransmissionsTest';
 import TransmissionNetworkTree from './TransmissionFixedNetwork';
 import LineList from './LineList';
 import EpidemicContainer from './EpidemicContainer';
-import { pdfFunctions, sampleDistribution, negbinSample } from '../lib/commonFunctions';
+import { pdfFunctions, sampleDistribution, negbinSample, meanFunctions } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
@@ -116,6 +118,7 @@ class App extends Component {
 							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 							params={this.state.distributionParameters}
 							pdf={pdfFunctions[this.state.distributionSelection]}
+							mean={meanFunctions[this.state.distributionSelection]}
 						/>
 					</div>
 					<div>
@@ -129,30 +132,49 @@ class App extends Component {
 				</div>
 				{this.state.transmissionTree.caseList.length > 1 ? (
 					<div>
-						<div className="inner">
-							<h1>EpiCurve</h1>
-							<EpidemicContainer
-								data={this.state.cases}
-								hoverElement={this.state.hover}
-								selectedElement={this.state.selected}
-								onHover={this.onHover}
-								offHover={this.offHover}
-								size={[1500, 800]}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-							/>
+						<div className="container">
+							<div />
+							<div>
+								<SerialIntervalTest
+									size={[700, 500]}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									Outbreak={this.state.transmissionTree}
+								/>
+							</div>
+							<div>
+								<NumberofTransmissionsTest
+									size={[700, 500]}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									Outbreak={this.state.transmissionTree}
+								/>
+							</div>
 						</div>
 						<div>
 							<div className="inner">
-								<h1>Transmission tree</h1>
-								<TransmissionNetworkTree
+								<h1>EpiCurve</h1>
+								<EpidemicContainer
+									data={this.state.cases}
 									hoverElement={this.state.hover}
+									selectedElement={this.state.selected}
 									onHover={this.onHover}
 									offHover={this.offHover}
 									size={[1500, 800]}
-									data={this.state.cases}
-									Outbreak={this.state.transmissionTree}
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								/>
+							</div>
+							<div>
+								<div className="inner">
+									<h1>Transmission tree</h1>
+									<TransmissionNetworkTree
+										hoverElement={this.state.hover}
+										onHover={this.onHover}
+										offHover={this.offHover}
+										size={[1500, 800]}
+										data={this.state.cases}
+										Outbreak={this.state.transmissionTree}
+										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									/>
+								</div>
 							</div>
 						</div>
 					</div>

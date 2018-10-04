@@ -129,17 +129,20 @@ export class Outbreak {
 	 */
 	transmit(donor, epiParameters) {
 		// How many transmissions with this case have
-		const numberOftransmissions = epiParameters.R0();
-		donor.children = [];
-		donor.contactEvents = true;
-		for (let i = 1; i <= numberOftransmissions; i++) {
-			const child = {
-				parent: donor,
-				level: donor.level + 1,
-				onset: donor.onset + epiParameters.serialInterval(),
-			};
-
-			donor.children.push(child);
+		if (!donor.children) {
+			const numberOftransmissions = epiParameters.R0();
+			donor.children = [];
+			donor.contactEvents = true;
+			for (let i = 1; i <= numberOftransmissions; i++) {
+				const child = {
+					parent: donor,
+					level: donor.level + 1,
+					onset: donor.onset + epiParameters.serialInterval(),
+				};
+				donor.children.push(child);
+			}
+		} else {
+			console.log(`Already seen node: ${donor.Id}`);
 		}
 	}
 

@@ -46,16 +46,7 @@ class NumberofTransmissions extends React.Component {
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
 			.domain([0, d3.max(data, d => d.p)]);
-		const makeLinePath = d3
-			.line()
-			.x(d => xScale(d.q))
-			.y(d => yScale(d.p));
 
-		const area = d3
-			.area()
-			.x(d => xScale(d.q))
-			.y0(height - this.props.margin.bottom - this.props.margin.top)
-			.y1(d => yScale(d.p));
 		//remove current plot
 		svg.selectAll('g').remove();
 		// do the drawing
@@ -87,7 +78,7 @@ class NumberofTransmissions extends React.Component {
 	render() {
 		const r = this.props.params[0];
 		const p = this.props.params[1];
-		const mean = (r * p) / (1 - p);
+		const mean = (r * (1 - p)) / p;
 		return (
 			<div>
 				<div>{`Number of transmissions/infection (Expectation: ${Number(mean).toFixed(2)})`}</div>
