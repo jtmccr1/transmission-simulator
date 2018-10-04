@@ -23,10 +23,9 @@ export class Outbreak {
 			contactEvents: false,
 		};
 		this.caseList = this.broadSearch();
-		this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
+		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
 		this.caseList.forEach((n, index) => (n.Id = `case ${index}`));
-
-		this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
+		//this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
 	}
 	/**
 	 * Gets the index case node of the outbreak
@@ -45,20 +44,20 @@ export class Outbreak {
 		return this.epiParams;
 	}
 	update() {
-		this.caseList = [...this.preorder()];
-		this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
-		this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
+		this.caseList = this.broadSearch();
+		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
+		this.caseList.forEach((n, index) => (n.Id = `case ${index}`));
 	}
-	/**
-	 * Returns a case from its key (a unique Symbol) stored in
-	 * the node as poperty 'key'.
-	 *
-	 * @param key
-	 * @returns {*}
-	 */
-	getCase(key) {
-		return this.caseMap.get(key);
-	}
+	// /**
+	//  * Returns a case from its key (a unique Symbol) stored in
+	//  * the node as poperty 'key'.
+	//  *
+	//  * @param key
+	//  * @returns {*}
+	//  */
+	// getCase(key) {
+	// 	return this.caseMap.get(key);
+	// }
 	/**
 	 * A generator function that returns the nodes in a post-order traversal.
 	 * This is borrowed from figtree.js c- Andrew Rambaut.

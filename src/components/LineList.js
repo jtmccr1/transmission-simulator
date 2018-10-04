@@ -30,7 +30,6 @@ class LineList extends Component {
 
 		const dataSet = this.props.data //add an id for each node then get the parent and children id lists
 			.map(node => {
-				node.Id = Symbol.keyFor(node.key);
 				node.onset = Number(node.onset.toFixed(2));
 				return node;
 			})
@@ -40,7 +39,7 @@ class LineList extends Component {
 				if (!node.children) {
 					node.childrenId = 'No contacts yet';
 				} else if (node.children.length === 0) {
-					node.childrenId = 'no forward transmission';
+					node.childrenId = 'No forward transmission';
 				} else {
 					node.childrenId = node.children.reduce((all, cur) => `${all}${cur.Id}, `, '');
 				}
