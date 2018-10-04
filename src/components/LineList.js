@@ -54,7 +54,7 @@ class LineList extends Component {
 		return (
 			<div>
 				<h2> {`Line List ( ${dataSet.length} cases) `} </h2>
-				<BootstrapTable data={dataSet} striped hover>
+				<BootstrapTable data={dataSet} exportCSV striped>
 					<TableHeaderColumn isKey dataField="Id" dataSort width="100" {...textColumn}>
 						Id
 					</TableHeaderColumn>
