@@ -133,7 +133,9 @@ class App extends Component {
 				{this.state.transmissionTree.caseList.length > 1 ? (
 					<div>
 						<div className="container">
-							<div />
+							<div>
+								<h2>Empirical parameters</h2>
+							</div>
 							<div>
 								<SerialIntervalTest
 									size={[700, 500]}

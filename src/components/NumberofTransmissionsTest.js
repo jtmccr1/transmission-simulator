@@ -89,7 +89,7 @@ class NumberofTransmissionsTest extends React.Component {
 		});
 		return (
 			<div>
-				<div>{`Number of transmissions/infection (mean: ${d3.mean(data).toFixed(2)}))`}</div>
+				<div>{`Number of transmissions/infection (mean: ${d3.mean(data).toFixed(2)})`}</div>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);
