@@ -8,7 +8,7 @@ import NumberofTransmissionsTest from './NumberofTransmissionsTest';
 import TransmissionNetworkTree from './TransmissionFixedNetwork';
 import LineList from './LineList';
 import EpidemicContainer from './EpidemicContainer';
-import { pdfFunctions, sampleDistribution, negbinSample, meanFunctions } from '../lib/commonFunctions';
+import { pdfFunctions, sampleDistribution, NegBinSample, meanFunctions } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
@@ -65,7 +65,7 @@ class App extends Component {
 			seedrandom(this.state.randomSeed, { global: true });
 		}
 		//const R = sampleDistribution[this.state.transmissionSelection];
-		const R = negbinSample;
+		const R = NegBinSample;
 		const serialInterval = sampleDistribution[this.state.distributionSelection];
 		const newTree = this.state.transmissionTree;
 

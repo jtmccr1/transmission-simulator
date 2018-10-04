@@ -27,7 +27,7 @@ class SerialInterval extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = getData(curriedPdf(R.__, ...this.props.params), 0.01).filter(d => isFinite(d.p));
+		const data = getData(curriedPdf(R.__, ...this.props.params), 0.005).filter(d => isFinite(d.p));
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3

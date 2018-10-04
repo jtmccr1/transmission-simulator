@@ -1,24 +1,6 @@
 import * as jStat from 'jStat';
 import * as d3 from 'd3';
 
-export const pdfFunctions = {
-	LogNormal: jStat.lognormal.pdf,
-	Gamma: jStat.gamma.pdf,
-};
-export const cdfFunctions = {
-	LogNormal: jStat.lognormal.cdf,
-	Gamma: jStat.gamma.cdf,
-};
-export const meanFunctions = {
-	LogNormal: jStat.lognormal.mean,
-	Gamma: jStat.gamma.mean,
-};
-export const sampleDistribution = {
-	LogNormal: jStat.lognormal.sample,
-	Gamma: jStat.gamma.sample,
-	NegativeBinomial: negbinSample,
-};
-
 // from http://bl.ocks.org/mbostock/4349187 from https://github.com/rambaut/Probability-of-Difference/blob/gh-pages/index.html
 // Sample from a normal distribution with mean 0, stddev 1.
 export const getData = (curriedF, xStep = 1, minP = 0.001, initial = 0) => {
@@ -88,10 +70,52 @@ export const poissonSample = lamda => {
 	return k - 1;
 };
 
-export const negbinSample = (r, p) => {
-	//sample lamda from gamma dist\
-	const lamda = jStat.gamma.sample(r, 1 - p);
-	//sample from poisson
-	const sample = poissonSample(lamda);
-	return sample;
+// export const negbinSample = (r, p) => {
+// 	//sample lamda from gamma dist\
+// 	const lamda = jStat.gamma.sample(r, 1 - p);
+// 	//sample from poisson
+// 	const sample = poissonSample(lamda);
+// 	return sample;
+// };
+
+export const NegBinPMF = (k, r, p) => {
+	if (k !== k >>> 0) {
+		return false;
+	}
+	if (k < 0) {
+		return 0;
+	}
+	return jStat.combination(k + r - 1, k) * Math.pow(p, k) * Math.pow(1 - p, r);
+};
+
+export const NegBinSample = (r, p) => {
+	const u = Math.random();
+	let k = 0;
+	let indexes = [k];
+	let cdf = NegBinPMF(k, r, p);
+	while (cdf < u) {
+		k++;
+		indexes.push(k);
+		cdf += NegBinPMF(k, r, p);
+	}
+	return k;
+};
+
+export const pdfFunctions = {
+	LogNormal: jStat.lognormal.pdf,
+	Gamma: jStat.gamma.pdf,
+	NegativeBinomial: NegBinPMF,
+};
+export const cdfFunctions = {
+	LogNormal: jStat.lognormal.cdf,
+	Gamma: jStat.gamma.cdf,
+};
+export const meanFunctions = {
+	LogNormal: jStat.lognormal.mean,
+	Gamma: jStat.gamma.mean,
+};
+export const sampleDistribution = {
+	LogNormal: jStat.lognormal.sample,
+	Gamma: jStat.gamma.sample,
+	NegativeBinomial: NegBinSample,
 };

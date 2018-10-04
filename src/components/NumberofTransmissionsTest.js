@@ -30,18 +30,30 @@ class NumberofTransmissionsTest extends React.Component {
 			return x.children.length;
 		});
 
+		let dataBin = [];
+		for (let i = 0; i <= d3.max(data); i++) {
+			const count = data.filter(x => x === i).length;
+			dataBin.push({
+				p: count / data.length,
+				q: i,
+			});
+		}
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
-			.scaleLinear()
+			.scaleBand()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(data)]);
-		const bins = d3.histogram().domain(xScale.domain())(data);
+			.padding(0.1)
+			.domain(
+				dataBin.map(function(d) {
+					return d.q;
+				})
+			);
+
 		const yScale = d3
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
-			.domain([0, d3.max(bins, d => d.length / data.length)])
-			.nice();
+			.domain([0, d3.max(dataBin, d => d.p)]);
 
 		//remove current plot
 		svg.selectAll('g').remove();
@@ -56,22 +68,20 @@ class NumberofTransmissionsTest extends React.Component {
 			yScale,
 			this.props.size,
 			this.props.margin,
-			'Days post infection onset',
+			'Number of infections',
 			'Probability density'
 		);
+
 		svgGroup
-			.attr('fill', 'steelblue')
 			.selectAll('rect')
-			.data(bins)
+			.data(dataBin)
 			.enter()
 			.append('rect')
-			.attr('x', d => xScale(d.x0) + 1)
-			.attr('width', d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 1))
-			.attr('y', d => yScale(d.length / data.length))
-			.attr(
-				'height',
-				d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.length / data.length)
-			);
+			.attr('class', 'prob-rect')
+			.attr('x', d => xScale(d.q))
+			.attr('width', xScale.bandwidth())
+			.attr('y', d => yScale(d.p))
+			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.p));
 	}
 	render() {
 		const data = this.props.Outbreak.caseList.filter(x => x.children).map(x => {

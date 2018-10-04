@@ -1,8 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import * as R from 'ramda';
-import * as jStat from 'jStat';
-import { getData, drawAxis } from '../lib/commonFunctions';
+import { getData, drawAxis, NegBinPMF } from '../lib/commonFunctions';
 
 class NumberofTransmissions extends React.Component {
 	constructor(props) {
@@ -21,7 +20,7 @@ class NumberofTransmissions extends React.Component {
 		//Helper functions
 
 		//This will be a negative binomial distribution
-		const curriedPdf = R.curry(jStat.negbin.pdf);
+		const curriedPdf = R.curry(NegBinPMF);
 		// draw the plot
 		const width = this.props.size[0];
 		const height = this.props.size[1];
@@ -29,7 +28,7 @@ class NumberofTransmissions extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = getData(curriedPdf(R.__, ...this.props.params), 1, 0.01, 0).filter(d => isFinite(d.p));
+		const data = getData(curriedPdf(R.__, ...this.props.params), 1, 0.001, 0).filter(d => isFinite(d.p));
 		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
@@ -78,7 +77,7 @@ class NumberofTransmissions extends React.Component {
 	render() {
 		const r = this.props.params[0];
 		const p = this.props.params[1];
-		const mean = (r * (1 - p)) / p;
+		const mean = (r * p) / (1 - p);
 		return (
 			<div>
 				<div>{`Number of transmissions/infection (Expectation: ${Number(mean).toFixed(2)})`}</div>
