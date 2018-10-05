@@ -79,7 +79,7 @@ class TransmissionNetworkTree extends React.Component {
 		const svgGroup = svg.select('g');
 		//Create SVG element
 		//Create edges as lines
-
+		const maxMutations = processedData.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
 		// edges
 		svgGroup
 			.selectAll('.line')
@@ -97,7 +97,7 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('fill', 'none')
 			.attr('stroke-width', 2)
 			.attr('d', edge => makeLinePath(edge.values))
-			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / 12));
+			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations));
 
 		//Create nodes as circles
 		svgGroup
@@ -112,7 +112,7 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.attr('fill', d => colorScale(d.mutationsFromRoot / 12));
+			.attr('fill', d => colorScale(d.mutationsFromRoot / maxMutations));
 
 		drawAxis(
 			svgGroup,
