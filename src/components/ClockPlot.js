@@ -23,14 +23,21 @@ class Clockyness extends React.Component {
 			const point = {
 				x: node.onset,
 				y: this.props.Outbreak.rootToTipLength(node),
+				expected: node.onset * (0.01 / 365),
 			};
 			return point;
 		});
+
+		const expectedLine = d3
+			.line()
+			.x(d => xScale(d.x))
+			.y(d => yScale(d.expected));
+
 		//const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent, target: d }));
 		const yScale = d3
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
-			.domain(d3.extent(processedData, d => d.y));
+			.domain(d3.extent(processedData, d => d.expected));
 		const xScale = d3
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
@@ -56,6 +63,12 @@ class Clockyness extends React.Component {
 			.attr('cx', d => xScale(d.x))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5);
+
+		svgGroup
+			.append('path')
+			.datum(processedData)
+			.attr('class', 'trendline')
+			.attr('d', expectedLine);
 
 		drawAxis(svgGroup, xScale, yScale, this.props.size, this.props.margin, 'Onset', 'Node Height');
 	}

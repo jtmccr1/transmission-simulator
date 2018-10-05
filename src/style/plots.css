@@ -21,3 +21,8 @@
 .area {
 	fill: lightsteelblue;
 }
+.trendline {
+	fill: none;
+	stroke: red;
+	stroke-width: 3px;
+}

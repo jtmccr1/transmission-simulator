@@ -82,8 +82,8 @@ class App extends Component {
 			};
 			newTree.evoParams = {
 				genomeLength: 3000,
-				rateSiteYear: 0.005,
-				rate: (0.005 * 3000) / 365,
+				rateSiteYear: 0.01,
+				rate: (0.01 * 3000) / 365,
 			};
 
 			let currentTime = this.state.time;
@@ -175,7 +175,7 @@ class App extends Component {
 							</div>
 						</div>
 						<div>
-							<div className="inner">
+							<div className="container">
 								<h1>EpiCurve</h1>
 								<EpidemicContainer
 									data={this.state.cases}
@@ -187,14 +187,14 @@ class App extends Component {
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									Outbreak={this.state.transmissionTree}
 								/>
-								<PhyloTree
-									Outbreak={this.state.transmissionTree}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-									size={[1500, 800]}
-								/>
 							</div>
 							<div>
 								<div className="inner">
+									<PhyloTree
+										Outbreak={this.state.transmissionTree}
+										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+										size={[1500, 800]}
+									/>
 									<h1>Transmission tree</h1>
 									<TransmissionNetworkTree
 										hoverElement={this.state.hover}
