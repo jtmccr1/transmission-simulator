@@ -1,8 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
-import { drawAxis } from '../lib/commonFunctions';
 
-class TransmissionNetworkTree extends React.Component {
+class PhyloTree extends React.Component {
 	constructor(props) {
 		super(props);
 		this.drawTransPlot = this.drawTransPlot.bind(this);
@@ -27,13 +26,13 @@ class TransmissionNetworkTree extends React.Component {
 			for (const [i, node] of externalNodes.entries()) {
 				//  x and y are in [0,1]
 				node.y = i / numberOfExternalNodes; // Other axis width?
-				node.mutationsFromRoot = tree.rootToTipMutations(node);
+				node.height = tree.rootToTipLength(node);
 			}
 			// internal nodes get the mean height of their childern
 			for (const node of [...tree.postorder()]) {
 				if (node.children && node.children.length > 0) {
 					node.y = d3.mean(node.children, kid => kid.y);
-					node.mutationsFromRoot = tree.rootToTipMutations(node);
+					node.height = tree.rootToTipLength(node);
 				}
 			}
 		}
@@ -62,14 +61,13 @@ class TransmissionNetworkTree extends React.Component {
 		const xScale = d3
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(processedData, d => d.onset)]);
-
-		const colorScale = d3.scaleSequential(d3.interpolateViridis);
+			.domain(d3.extent(processedData, d => d.height));
 
 		const makeLinePath = d3
 			.line()
-			.x(d => xScale(d.onset))
+			.x(d => xScale(d.height))
 			.y(d => yScale(d.y));
+		//.curve(d3.curveStepBefore);
 		//remove current plot
 		svg.selectAll('g').remove();
 		svg.append('g').attr('transform', `translate(${this.props.margin.left},${this.props.margin.top})`);
@@ -85,17 +83,17 @@ class TransmissionNetworkTree extends React.Component {
 				processedData.filter(n => n.parent).map(n => {
 					return {
 						target: n,
-						values: [{ onset: n.parent.onset, y: n.parent.y }, { onset: n.onset, y: n.y }],
+						values: [{ height: n.parent.height, y: n.parent.y }, { height: n.height, y: n.y }],
 					};
 				})
 			)
 			.enter()
 			.append('path')
-			.attr('class', 'branch')
+			.attr('class', 'line branch')
 			.attr('fill', 'none')
+			.attr('stroke', 'black')
 			.attr('stroke-width', 2)
-			.attr('d', edge => makeLinePath(edge.values))
-			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / 6));
+			.attr('d', edge => makeLinePath(edge.values));
 
 		//Create nodes as circles
 		svgGroup
@@ -104,24 +102,20 @@ class TransmissionNetworkTree extends React.Component {
 			.enter()
 			.append('circle');
 
+		//const minNon0Branch = d3.min(processedData.filter(x => x.branchLength > 0), d => d.branchLength) * 0.1;
 		svgGroup
 			.selectAll('circle')
 			.attr('id', d => d.Id)
-			.attr('cx', d => xScale(d.onset))
+			.attr('cx', d => xScale(d.height)) //Math.max(xScale(d.height), xScale(minNon0Branch)))
 			.attr('cy', d => yScale(d.y))
-			.attr('r', 5)
-			.attr('fill', d => colorScale(d.mutationsFromRoot / 6));
+			.attr('r', 5);
 
-		drawAxis(
-			svgGroup,
-			xScale,
-			d3.scaleLinear().range(0),
-			this.props.size,
-			this.props.margin,
-			'Days since index case',
-			''
-		);
-		svgGroup.select('.y').remove();
+		svgGroup.selectAll('.branch').on('mouseover', function(d, i) {
+			d3.select(this).attr('stroke-width', 5);
+		});
+		svgGroup.selectAll('.branch').on('mouseout', function(d, i) {
+			d3.select(this).attr('stroke-width', 2);
+		});
 		// .style('fill', (d, i) => {
 		// 	if (this.props.hoverElement === d.Id) {
 		// 		return '#FCBC34';
@@ -140,4 +134,4 @@ class TransmissionNetworkTree extends React.Component {
 	}
 }
 
-export default TransmissionNetworkTree;
+export default PhyloTree;

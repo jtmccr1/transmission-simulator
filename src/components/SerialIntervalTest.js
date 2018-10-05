@@ -1,7 +1,6 @@
 import React from 'react';
 import * as d3 from 'd3';
-import * as R from 'ramda';
-import { getData, drawAxis } from '../lib/commonFunctions';
+import { drawAxis } from '../lib/commonFunctions';
 
 class SerialIntervalTest extends React.Component {
 	constructor(props) {

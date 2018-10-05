@@ -15,8 +15,9 @@ export class Outbreak {
 	 * @param {object} params - The parameters governing the outbreak.
 	 * These are curried functions that wait for an x value, and are keyed as {infectivityCDF:,R0cdf:}
 	 */
-	constructor(params = {}) {
-		this.epiParams = params;
+	constructor(epiParams = {}, evoParams = {}) {
+		this.epiParams = epiParams;
+		this.evoParams = evoParams;
 		this.index = {
 			onset: 0,
 			level: 0,
@@ -127,7 +128,20 @@ export class Outbreak {
 	 * where each entry is a function which returns a sample from a distribution.
 	 * @returns adds children to donor case if transmission occurs
 	 */
-	transmit(donor, epiParameters) {
+	transmit(donor, epiParameters, evoParams) {
+		const samplePoisson = lamda => {
+			{
+				let L = Math.exp(-lamda);
+				let k = 0;
+				let p = 1;
+				while (p > L) {
+					k++;
+					const u = Math.random();
+					p = u * p;
+				}
+				return k - 1;
+			}
+		};
 		// How many transmissions with this case have
 		if (!donor.children) {
 			const numberOftransmissions = epiParameters.R0();
@@ -139,6 +153,9 @@ export class Outbreak {
 					level: donor.level + 1,
 					onset: donor.onset + epiParameters.serialInterval(),
 				};
+				child.branchLengthTime = child.onset - donor.onset;
+				child.mutations = samplePoisson(evoParams.rate * child.branchLengthTime);
+				child.branchLength = child.mutations / evoParams.genomeLength;
 				donor.children.push(child);
 			}
 		} else {
@@ -152,7 +169,80 @@ export class Outbreak {
 	 * @param levels - the number of levels to add to the growing transmission chain.
 	 */
 	spread() {
-		this.caseList.filter(x => !x.contactEvents).map(node => this.transmit(node, this.epiParams));
+		this.caseList.filter(x => !x.contactEvents).map(node => this.transmit(node, this.epiParams, this.evoParams));
 		this.update();
+	}
+
+	// These are from Figtree.js
+	/**
+	 * Reverses the order of the children of the given node. If 'recursive=true' then it will
+	 * descend down the subtree reversing all the sub nodes.
+	 *
+	 * @param node
+	 * @param recursive
+	 */
+	rotate(node, recursive = false) {
+		if (node.children) {
+			if (recursive) {
+				for (const child of node.children) {
+					this.rotate(child, recursive);
+				}
+			}
+			node.children.reverse();
+		}
+	}
+
+	/**
+	 * Sorts the child branches of each node in order of increasing or decreasing number
+	 * of tips. This operates recursively from the node give.
+	 *
+	 * @param node - the node to start sorting from
+	 * @param {boolean} increasing - sorting in increasing node order or decreasing?
+	 * @returns {number} - the number of tips below this node
+	 */
+	order(node, increasing = true) {
+		const factor = increasing ? 1 : -1;
+		let count = 0;
+
+		if (node.children) {
+			const counts = new Map();
+
+			for (const child of node.children) {
+				const value = this.order(child, increasing);
+
+				counts.set(child, value);
+				count += value;
+			}
+			node.children.sort((a, b) => counts.get(a) - counts.get(b) * factor);
+		} else {
+			count = 1;
+		}
+		return count;
+	}
+
+	/**
+	 * Gives the distance from the root to a given tip (external node).
+	 * @param tip - the external node
+	 * @returns {number}
+	 */
+	rootToTipLength(tip) {
+		let length = 0.0;
+		let node = tip;
+
+		while (node.parent) {
+			length += node.branchLength;
+			node = node.parent;
+		}
+		return length;
+	}
+	rootToTipMutations(tip) {
+		let length = 0.0;
+		let node = tip;
+
+		while (node.parent) {
+			length += node.mutations;
+			node = node.parent;
+		}
+		return length;
 	}
 }

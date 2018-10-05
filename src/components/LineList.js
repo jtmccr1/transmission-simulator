@@ -34,6 +34,10 @@ class LineList extends Component {
 				return node;
 			})
 			.map(node => {
+				node.mutationsFromRoot = this.props.Outbreak.rootToTipMutations(node);
+				return node;
+			})
+			.map(node => {
 				node.parentId = node.parent ? node.parent.Id : 'None';
 
 				if (!node.children) {
@@ -41,7 +45,7 @@ class LineList extends Component {
 				} else if (node.children.length === 0) {
 					node.childrenId = 'No forward transmission';
 				} else {
-					node.childrenId = node.children.reduce((all, cur) => `${all}${cur.Id}, `, '');
+					node.childrenId = node.children.reduce((all, cur) => `${all}${cur.Id}; `, '');
 				}
 				return node;
 			});
@@ -66,6 +70,9 @@ class LineList extends Component {
 					</TableHeaderColumn>
 					<TableHeaderColumn dataField="childrenId" dataSort width="200" {...textColumn}>
 						Recipient Contact
+					</TableHeaderColumn>
+					<TableHeaderColumn dataField="mutationsFromRoot" dataSort width="200" {...textColumn}>
+						SNP relative to root
 					</TableHeaderColumn>
 				</BootstrapTable>
 			</div>

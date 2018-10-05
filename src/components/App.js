@@ -6,12 +6,14 @@ import NumberofTransmissions from './NumberofTransmissions';
 import SerialIntervalTest from './SerialIntervalTest';
 import NumberofTransmissionsTest from './NumberofTransmissionsTest';
 import TransmissionNetworkTree from './TransmissionFixedNetwork';
+import PhyloTree from './PhyloTree';
 import LineList from './LineList';
 import EpidemicContainer from './EpidemicContainer';
 import { pdfFunctions, sampleDistribution, NegBinSample, meanFunctions } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
+import Clockyness from './ClockPlot';
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -64,27 +66,48 @@ class App extends Component {
 		) {
 			seedrandom(this.state.randomSeed, { global: true });
 		}
-		//const R = sampleDistribution[this.state.transmissionSelection];
-		const R = NegBinSample;
-		const serialInterval = sampleDistribution[this.state.distributionSelection];
-		const newTree = this.state.transmissionTree;
+		let activeInfections = this.state.transmissionTree.caseList.filter(x => !x.contactEvents).length;
 
-		newTree.epiParams = {
-			R0: () => R(...this.state.transmissionParameters),
-			serialInterval: () => serialInterval(...this.state.distributionParameters),
-		};
+		if (activeInfections > 500) {
+			alert('Reacted maximum number of active infections (500)');
+		} else {
+			//const R = sampleDistribution[this.state.transmissionSelection];
+			const R = NegBinSample;
+			const serialInterval = sampleDistribution[this.state.distributionSelection];
+			const newTree = this.state.transmissionTree;
 
-		let currentTime = this.state.time;
-		const targetTime = currentTime + this.state.addDays;
-		while ((currentTime < targetTime) & (newTree.caseList.filter(x => !x.children).length > 0)) {
-			newTree.spread();
-			currentTime = newTree.caseList.map(node => node.onset).reduce((max, cur) => Math.max(max, cur), -Infinity);
+			newTree.epiParams = {
+				R0: () => R(...this.state.transmissionParameters),
+				serialInterval: () => serialInterval(...this.state.distributionParameters),
+			};
+			newTree.evoParams = {
+				genomeLength: 3000,
+				rateSiteYear: 0.005,
+				rate: (0.005 * 3000) / 365,
+			};
+
+			let currentTime = this.state.time;
+			const targetTime = currentTime + this.state.addDays;
+			while (
+				(currentTime < targetTime) &
+				(newTree.caseList.filter(x => !x.children).length > 0) &
+				(activeInfections < 500)
+			) {
+				newTree.spread();
+				currentTime = newTree.caseList
+					.map(node => node.onset)
+					.reduce((max, cur) => Math.max(max, cur), -Infinity);
+				activeInfections = newTree.caseList.filter(x => !x.contactEvents).length;
+			}
+			this.setState({
+				transmissionTree: newTree,
+				time: targetTime,
+				cases: newTree.caseList.filter(x => x.onset <= targetTime),
+			});
+			if (activeInfections > 500) {
+				alert('Reacted maximum number of active infections(500)');
+			}
 		}
-		this.setState({
-			transmissionTree: newTree,
-			time: targetTime,
-			cases: newTree.caseList.filter(x => x.onset <= targetTime),
-		});
 	}
 	reset() {
 		this.setState({ transmissionTree: new Outbreak(), time: 0, cases: [] });
@@ -156,12 +179,18 @@ class App extends Component {
 								<h1>EpiCurve</h1>
 								<EpidemicContainer
 									data={this.state.cases}
-									hoverElement={this.state.hover}
-									selectedElement={this.state.selected}
-									onHover={this.onHover}
-									offHover={this.offHover}
-									size={[1500, 800]}
+									size={[700, 500]}
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								/>
+								<Clockyness
+									size={[700, 500]}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									Outbreak={this.state.transmissionTree}
+								/>
+								<PhyloTree
+									Outbreak={this.state.transmissionTree}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									size={[1500, 800]}
 								/>
 							</div>
 							<div>
@@ -184,7 +213,7 @@ class App extends Component {
 					<div />
 				)}
 				<div className="inner">
-					<LineList data={this.state.cases} />
+					<LineList data={this.state.cases} Outbreak={this.state.transmissionTree} />
 				</div>
 			</div>
 		);
