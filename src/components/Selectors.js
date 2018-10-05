@@ -174,11 +174,11 @@ const Selectors = props => {
 			<h3>Simulate Transmission</h3>
 			<div>
 				<label>Set Random Seed</label>
-				<InputBox placeHolder={43} updater={props.updater} value={props.randomSeed} stateKey={'randomSeed'} />
+				<InputBox updater={props.updater} value={props.randomSeed} stateKey={'randomSeed'} />
 			</div>
 			<div>
 				<label>Days to add to current outbreak</label>
-				<InputBox placeHolder={1} updater={props.updater} value={props.addDays} stateKey={'addDays'} />
+				<InputBox updater={props.updater} value={props.addDays} stateKey={'addDays'} />
 			</div>
 			<button onClick={props.buttonAction}>Run Outbreak</button>
 			<button onClick={props.reset}>Reset</button>
