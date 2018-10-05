@@ -176,7 +176,6 @@ class App extends Component {
 						</div>
 						<div>
 							<div className="container">
-								<h1>EpiCurve</h1>
 								<EpidemicContainer
 									data={this.state.cases}
 									size={[700, 500]}
@@ -190,11 +189,11 @@ class App extends Component {
 							</div>
 							<div>
 								<div className="inner">
-									<PhyloTree
+									{/*<PhyloTree
 										Outbreak={this.state.transmissionTree}
 										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 										size={[1500, 800]}
-									/>
+									/>*/}
 									<h1>Transmission tree</h1>
 									<TransmissionNetworkTree
 										hoverElement={this.state.hover}

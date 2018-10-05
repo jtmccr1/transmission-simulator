@@ -19,6 +19,7 @@ class TransmissionNetworkTree extends React.Component {
 			// external nodes are taken from the nodelist which is preorder traversal
 			const numberOfExternalNodes = tree.externalCases.length;
 			// Here we get the order based on a current traversal
+			tree.order(tree.index);
 			let postOrder = [...tree.postorder()];
 			const externalNodes = tree.externalCases.sort((a, b) => {
 				return postOrder.indexOf(a) - postOrder.indexOf(b);
@@ -69,7 +70,8 @@ class TransmissionNetworkTree extends React.Component {
 		const makeLinePath = d3
 			.line()
 			.x(d => xScale(d.onset))
-			.y(d => yScale(d.y));
+			.y(d => yScale(d.y))
+			.curve(d3.curveStepBefore);
 		//remove current plot
 		svg.selectAll('g').remove();
 		svg.append('g').attr('transform', `translate(${this.props.margin.left},${this.props.margin.top})`);
@@ -95,7 +97,7 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('fill', 'none')
 			.attr('stroke-width', 2)
 			.attr('d', edge => makeLinePath(edge.values))
-			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / 6));
+			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / 12));
 
 		//Create nodes as circles
 		svgGroup
@@ -110,7 +112,7 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.attr('fill', d => colorScale(d.mutationsFromRoot / 6));
+			.attr('fill', d => colorScale(d.mutationsFromRoot / 12));
 
 		drawAxis(
 			svgGroup,

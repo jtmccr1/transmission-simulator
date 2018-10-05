@@ -70,12 +70,13 @@ class Clockyness extends React.Component {
 			.attr('class', 'trendline')
 			.attr('d', expectedLine);
 
-		drawAxis(svgGroup, xScale, yScale, this.props.size, this.props.margin, 'Onset', 'Node Height');
+		drawAxis(svgGroup, xScale, yScale, this.props.size, this.props.margin, 'Day of infection', 'Node Height');
 	}
 
 	render() {
 		return (
 			<div>
+				<h3>Evolution rate vs. expectation (red)</h3>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);

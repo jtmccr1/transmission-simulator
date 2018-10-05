@@ -44,15 +44,7 @@ class EpidemicContainer extends React.Component {
 
 		const svgGroup = svg.select('g');
 
-		drawAxis(
-			svgGroup,
-			xScale,
-			yScale,
-			this.props.size,
-			this.props.margin,
-			'Days since index case',
-			'Probability density'
-		);
+		drawAxis(svgGroup, xScale, yScale, this.props.size, this.props.margin, 'Day of infection', 'Cases');
 		svgGroup
 			.attr('fill', 'steelblue')
 			.selectAll('rect')
@@ -68,6 +60,7 @@ class EpidemicContainer extends React.Component {
 	render() {
 		return (
 			<div>
+				<h3>Case counts</h3>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);
