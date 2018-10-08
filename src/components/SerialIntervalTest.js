@@ -25,7 +25,7 @@ class SerialIntervalTest extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = this.props.Outbreak.caseList.filter(x => x.parent).map(x => {
+		const data = this.props.Outbreak.caseList.filter(x => x.onset <= this.props.time && x.parent).map(x => {
 			return x.onset - x.parent.onset;
 		});
 
