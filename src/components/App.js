@@ -212,6 +212,8 @@ class App extends Component {
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								Outbreak={this.state.transmissionTree}
 								time={this.state.time}
+								selectedCases={this.state.selectedCases}
+								selectSample={this.selectSample}
 							/>
 						</div>
 						<div>

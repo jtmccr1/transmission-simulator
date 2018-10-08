@@ -24,6 +24,7 @@ class Clockyness extends React.Component {
 				x: node.onset,
 				y: this.props.Outbreak.rootToTipLength(node),
 				expected: node.onset * (0.01 / 365),
+				node: node,
 			};
 			return point;
 		});
@@ -62,7 +63,13 @@ class Clockyness extends React.Component {
 			.selectAll('circle')
 			.attr('cx', d => xScale(d.x))
 			.attr('cy', d => yScale(d.y))
-			.attr('r', 5);
+			.attr('r', 5)
+			.style('stroke', d => {
+				const color = this.props.selectedCases.map(n => n.Id).indexOf(d.node.Id) > -1 ? 'red' : 'black';
+				return color;
+			})
+			.style('stroke-width', 2)
+			.on('click', d => this.props.selectSample(d.node));
 
 		svgGroup
 			.append('path')
