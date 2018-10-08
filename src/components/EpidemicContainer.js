@@ -23,13 +23,13 @@ class EpidemicContainer extends React.Component {
 		const node = this.node;
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
-
+		const processedData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time);
 		const xScale = d3
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain(d3.extent(this.props.data, d => d.onset))
+			.domain(d3.extent(processedData, d => d.onset))
 			.nice();
-		const bins = d3.histogram().domain(xScale.domain())(this.props.data.map(d => d.onset));
+		const bins = d3.histogram().domain(xScale.domain())(processedData.map(d => d.onset));
 
 		const yScale = d3
 			.scaleLinear()

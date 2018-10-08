@@ -2,7 +2,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import { drawAxis } from '../lib/commonFunctions';
 
-class TransmissionNetworkTree extends React.Component {
+class SelectedTransmissionNetwork extends React.Component {
 	constructor(props) {
 		super(props);
 		this.drawTransPlot = this.drawTransPlot.bind(this);
@@ -14,6 +14,8 @@ class TransmissionNetworkTree extends React.Component {
 		this.drawTransPlot();
 	}
 	drawTransPlot() {
+		// get sub tree from samples -
+
 		function positionNodes(tree) {
 			// external nodes get assigned height in 0-1.
 			// external nodes are taken from the nodelist which is preorder traversal
@@ -38,23 +40,15 @@ class TransmissionNetworkTree extends React.Component {
 				}
 			}
 		}
-		positionNodes(this.props.Outbreak);
+		const subtree = this.props.Outbreak.subtree(this.props.selectedCases);
+		// positionNodes(this.props.Outbreak)
+		positionNodes(subtree);
 		const node = this.node;
 		const width = this.props.size[0];
 		const height = this.props.size[1];
 		const svg = d3.select(node).style('font', '10px sans-serif');
-		// get space not effient
-		// const that = this;
-		// this.props.data.forEach(d => {
-		// 	const offspring = [...that.props.Outbreak.preorder(d)].length - 1;
-		// 	const neices = that.props.data
-		// 		.filter(node => node.level === d.level)
-		// 		.map(node => [...that.props.Outbreak.preorder(node)].length - 1)
-		// 		.reduce((acc, curr) => acc + curr, 0);
-		// 	const proportion = offspring / neices;
-		// 	d.y = proportion * 0.5;
-		// });
-		const processedData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time);
+
+		const processedData = subtree.caseList;
 		//const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent, target: d }));
 		const yScale = d3
 			.scaleLinear()
@@ -79,7 +73,7 @@ class TransmissionNetworkTree extends React.Component {
 		const svgGroup = svg.select('g');
 		//Create SVG element
 		//Create edges as lines
-		const maxMutations = processedData.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
+		const maxMutations = this.props.Outbreak.caseList.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
 		// edges
 		svgGroup
 			.selectAll('.line')
@@ -112,17 +106,7 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.style('fill', d => colorScale(d.mutationsFromRoot / maxMutations))
-			.style('stroke-width', 2)
-			.style('stroke', d => {
-				const color =
-					this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1
-						? 'red'
-						: colorScale(d.mutationsFromRoot / maxMutations);
-				return color;
-			})
-
-			.on('click', d => this.props.selectSample(d));
+			.style('fill', d => colorScale(d.mutationsFromRoot / maxMutations));
 
 		drawAxis(
 			svgGroup,
@@ -145,4 +129,4 @@ class TransmissionNetworkTree extends React.Component {
 	}
 }
 
-export default TransmissionNetworkTree;
+export default SelectedTransmissionNetwork;

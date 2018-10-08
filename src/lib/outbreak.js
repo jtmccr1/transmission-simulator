@@ -15,16 +15,22 @@ export class Outbreak {
 	 * @param {object} params - The parameters governing the outbreak.
 	 * These are curried functions that wait for an x value, and are keyed as {infectivityCDF:,R0cdf:}
 	 */
-	constructor(epiParams = {}, evoParams = {}) {
-		this.epiParams = epiParams;
-		this.evoParams = evoParams;
-		this.index = {
+	constructor(
+		index = {
 			onset: 0,
 			level: 0,
-		};
+		},
+		epiParams = {},
+		evoParams = {}
+	) {
+		this.epiParams = epiParams;
+		this.evoParams = evoParams;
+
+		this.index = index;
+
 		this.caseList = this.broadSearch();
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
-		this.caseList.forEach((n, index) => (n.Id = `case ${index}`));
+		this.caseList.forEach((n, index) => (n.Id = n.Id ? n.Id : `case ${index}`));
 		//this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
 	}
 	/**
@@ -242,5 +248,55 @@ export class Outbreak {
 			node = node.parent;
 		}
 		return length;
+	}
+
+	/**
+	 * returns the most recent common ancestor of the nodes provided.
+	 * @param nodes -
+	 * @returns {mrca node}
+	 */
+	MRCA(nodes) {
+		const getAncestors = node => {
+			let ancestors = [node];
+			while (node.parent) {
+				ancestors.push(node.parent);
+				node = node.parent;
+			}
+			return ancestors;
+		};
+		const getMCRA = (node1, node2) => {
+			const ancestor1 = getAncestors(node1);
+			const ancestor2 = getAncestors(node2);
+			const commonAncestors = ancestor1.filter(x => ancestor2.map(y => y.id).indexOf(x.id) > -1);
+			const mrca = commonAncestors.reduce(
+				(acc, curr) => (acc.onset > curr.onset ? acc : curr),
+				commonAncestors[0]
+			);
+			return mrca;
+		};
+		let currentMRCA = getMCRA(nodes[0], nodes[1]);
+		for (let i = 2; i < nodes.length; i++) {
+			currentMRCA = getMCRA(currentMRCA, nodes[i]);
+		}
+		return currentMRCA;
+	}
+	/**
+	 * Gives subtree defined by the nodes provided back to their most recent common ancestor or all ancestors
+	 * @param nodes - the external node
+	 * @returns {oubreak object}
+	 */
+	subtree(nodes) {
+		const mcra = this.MRCA(nodes);
+		const subtreeObj = new Outbreak(mcra);
+		// const childAncestors = [...nodes];
+		// for (const child of nodes) {
+		// 	let node = child;
+		// 	while (node.parent) {
+		// 		childAncestors.push(node.parent);
+		// 		node = node.parent;
+		// 	}
+		// }
+		//return childAncestors.filter(x => x.onset >= mcra.onset);
+		return subtreeObj;
 	}
 }

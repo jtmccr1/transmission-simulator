@@ -26,7 +26,7 @@ class NumberofTransmissionsTest extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = this.props.Outbreak.caseList.filter(x => x.children).map(x => {
+		const data = this.props.Outbreak.caseList.filter(x => x.onset <= this.props.time && x.children).map(x => {
 			return x.children.length;
 		});
 

@@ -15,6 +15,7 @@ import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
 import Clockyness from './ClockPlot';
 import on from 'd3-selection/src/selection/on';
+import SelectedTransmissionNetwork from './SelectedTransmissionTree';
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -184,6 +185,7 @@ class App extends Component {
 									size={[700, 500]}
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									Outbreak={this.state.transmissionTree}
+									time={this.state.time}
 								/>
 							</div>
 							<div>
@@ -191,6 +193,7 @@ class App extends Component {
 									size={[700, 500]}
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									Outbreak={this.state.transmissionTree}
+									time={this.state.time}
 								/>
 							</div>
 						</div>
@@ -199,24 +202,21 @@ class App extends Component {
 								<h2> Outbreak characteristics</h2>
 							</div>
 							<EpidemicContainer
-								data={this.state.cases}
+								Outbreak={this.state.transmissionTree}
 								size={[700, 500]}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								time={this.state.time}
 							/>
 							<Clockyness
 								size={[700, 500]}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								Outbreak={this.state.transmissionTree}
+								time={this.state.time}
 							/>
 						</div>
 						<div>
 							<div>
 								<div className="inner">
-									{/*<PhyloTree
-										Outbreak={this.state.transmissionTree}
-										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-										size={[1500, 800]}
-									/>*/}
 									<h1>Transmission tree</h1>
 									<TransmissionNetworkTree
 										size={[1500, 800]}
@@ -225,10 +225,24 @@ class App extends Component {
 										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 										selectedCases={this.state.selectedCases}
 										selectSample={this.selectSample}
+										time={this.state.time}
 									/>
 								</div>
 							</div>
 						</div>
+					</div>
+				) : (
+					<div />
+				)}
+				{this.state.selectedCases.length > 1 ? (
+					<div className="inner">
+						<SelectedTransmissionNetwork
+							size={[700, 500]}
+							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+							Outbreak={this.state.transmissionTree}
+							selectedCases={this.state.selectedCases}
+							time={this.state.time}
+						/>
 					</div>
 				) : (
 					<div />
@@ -239,6 +253,7 @@ class App extends Component {
 						Outbreak={this.state.transmissionTree}
 						selectSample={this.selectSample}
 						selectedCases={this.state.selectedCases}
+						time={this.state.time}
 					/>
 				</div>
 			</div>

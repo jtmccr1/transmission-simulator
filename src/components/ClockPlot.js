@@ -19,7 +19,7 @@ class Clockyness extends React.Component {
 		const height = this.props.size[1];
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const processedData = this.props.Outbreak.caseList.map(node => {
+		const processedData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time).map(node => {
 			const point = {
 				x: node.onset,
 				y: this.props.Outbreak.rootToTipLength(node),
