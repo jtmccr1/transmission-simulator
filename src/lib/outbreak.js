@@ -267,7 +267,7 @@ export class Outbreak {
 		const getMCRA = (node1, node2) => {
 			const ancestor1 = getAncestors(node1);
 			const ancestor2 = getAncestors(node2);
-			const commonAncestors = ancestor1.filter(x => ancestor2.map(y => y.id).indexOf(x.id) > -1);
+			const commonAncestors = ancestor1.filter(x => ancestor2.map(y => y.Id).indexOf(x.Id) > -1);
 			const mrca = commonAncestors.reduce(
 				(acc, curr) => (acc.onset > curr.onset ? acc : curr),
 				commonAncestors[0]

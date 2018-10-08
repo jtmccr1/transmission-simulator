@@ -23,7 +23,8 @@ class App extends Component {
 		this.updateOutbreak = this.updateOutbreak.bind(this);
 		this.reset = this.reset.bind(this);
 		this.selectSample = this.selectSample.bind(this);
-		this.onRowSelect = this.onRowSelect.bind(this);
+		this.zoomToNode = this.zoomToNode.bind(this);
+		this.resetZoom = this.resetZoom.bind(this);
 		this.state = {
 			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
@@ -38,6 +39,9 @@ class App extends Component {
 			cases: [],
 			selectedCases: [],
 		};
+		this.setState({
+			zoomNode: this.state.transmissionTree.indexCase,
+		});
 	}
 	selectSample(node) {
 		const selectedCases = this.state.selectedCases;
@@ -53,21 +57,9 @@ class App extends Component {
 		}
 	}
 
-	onRowSelect(row, isSelected, e) {
-		console.log(row);
+	zoomToNode(node) {
+		this.setState({ zoomNode: node });
 	}
-
-	// function onSelectAll(isSelected, rows) {
-	// 	alert(`is select all: ${isSelected}`);
-	// 	if (isSelected) {
-	// 		alert('Current display and selected data: ');
-	// 	} else {
-	// 		alert('unselect rows: ');
-	// 	}
-	// 	for (let i = 0; i < rows.length; i++) {
-	// 		alert(rows[i].id);
-	// 	}
-	// }
 
 	updateOnSelection(key, index, event, numeric = true) {
 		let newState = {};
@@ -130,8 +122,16 @@ class App extends Component {
 			}
 		}
 	}
+	resetZoom() {
+		this.setState({
+			zoomNode: this.state.transmissionTree.indexCase,
+		});
+	}
 	reset() {
 		this.setState({ transmissionTree: new Outbreak(), time: 0, cases: [], selectedCases: [] });
+		this.setState({
+			zoomNode: this.state.transmissionTree.indexCase,
+		});
 	}
 
 	render() {
@@ -226,6 +226,9 @@ class App extends Component {
 										selectedCases={this.state.selectedCases}
 										selectSample={this.selectSample}
 										time={this.state.time}
+										zoomNode={this.state.zoomNode}
+										zoomToNode={this.zoomToNode}
+										resetZoom={this.resetZoom}
 									/>
 								</div>
 							</div>

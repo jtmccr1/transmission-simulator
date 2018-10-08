@@ -48,11 +48,19 @@ class SelectedTransmissionNetwork extends React.Component {
 		const height = this.props.size[1];
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const processedData = subtree.caseList;
+		const processedData = subtree.caseList.filter(x => x.onset <= this.props.time);
+		let selectedPath = [...this.props.selectedCases];
+		for (const node of this.props.selectedCases) {
+			let currentNode = node;
+			while (currentNode.parent) {
+				selectedPath.push(currentNode.parent);
+				currentNode = currentNode.parent;
+			}
+		}
 		//const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent, target: d }));
 		const yScale = d3
 			.scaleLinear()
-			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
+			.range([height - this.props.margin.top - this.props.margin.bottom - 10, this.props.margin.bottom])
 			.domain([0, 1]);
 		const xScale = d3
 			.scaleLinear()
@@ -78,7 +86,7 @@ class SelectedTransmissionNetwork extends React.Component {
 		svgGroup
 			.selectAll('.line')
 			.data(
-				processedData.filter(n => n.parent).map(n => {
+				processedData.filter(n => n.Id !== subtree.indexCase.Id).map(n => {
 					return {
 						target: n,
 						values: [{ onset: n.parent.onset, y: n.parent.y }, { onset: n.onset, y: n.y }],
@@ -91,7 +99,8 @@ class SelectedTransmissionNetwork extends React.Component {
 			.attr('fill', 'none')
 			.attr('stroke-width', 2)
 			.attr('d', edge => makeLinePath(edge.values))
-			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations));
+			.style('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations))
+			.attr('stroke-opacity', d => (selectedPath.map(c => c.Id).indexOf(d.target.Id) > -1 ? 1 : 0.1));
 
 		//Create nodes as circles
 		svgGroup
@@ -106,8 +115,8 @@ class SelectedTransmissionNetwork extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.style('fill', d => colorScale(d.mutationsFromRoot / maxMutations));
-
+			.style('fill', d => colorScale(d.mutationsFromRoot / maxMutations))
+			.attr('fill-opacity', d => (this.props.selectedCases.map(c => c.Id).indexOf(d.Id) > -1 ? 1 : 0.1));
 		drawAxis(
 			svgGroup,
 			xScale,

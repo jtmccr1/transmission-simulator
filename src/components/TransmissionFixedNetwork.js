@@ -13,6 +13,7 @@ class TransmissionNetworkTree extends React.Component {
 	componentDidUpdate() {
 		this.drawTransPlot();
 	}
+
 	drawTransPlot() {
 		function positionNodes(tree) {
 			// external nodes get assigned height in 0-1.
@@ -54,16 +55,18 @@ class TransmissionNetworkTree extends React.Component {
 		// 	const proportion = offspring / neices;
 		// 	d.y = proportion * 0.5;
 		// });
-		const processedData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time);
+		const displayNodes = this.props.Outbreak.broadSearch(this.props.zoomNode);
+		const allData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time);
+		const processedData = allData.filter(d => displayNodes.map(e => e.Id).indexOf(d.Id) > -1);
 		//const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent, target: d }));
 		const yScale = d3
 			.scaleLinear()
-			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
-			.domain([0, 1]);
+			.range([height - this.props.margin.top - this.props.margin.bottom - 10, this.props.margin.bottom])
+			.domain([d3.min(processedData, d => d.y), d3.max(processedData, d => d.y)]);
 		const xScale = d3
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(processedData, d => d.onset)]);
+			.domain([d3.min(processedData, d => d.onset), d3.max(processedData, d => d.onset)]);
 
 		const colorScale = d3.scaleSequential(d3.interpolateViridis);
 
@@ -79,7 +82,7 @@ class TransmissionNetworkTree extends React.Component {
 		const svgGroup = svg.select('g');
 		//Create SVG element
 		//Create edges as lines
-		const maxMutations = processedData.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
+		const maxMutations = allData.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
 		// edges
 		svgGroup
 			.selectAll('.line')
@@ -99,6 +102,18 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('d', edge => makeLinePath(edge.values))
 			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations));
 
+		svgGroup
+			.selectAll('.branch')
+			.on('mouseover', function(d, i) {
+				console.log(this);
+				d3.select(this).attr('stroke-width', 5);
+			})
+			.on('mouseout', function(d, i) {
+				d3.select(this).attr('stroke-width', 2);
+			})
+			.on('click', (d, i) => this.props.zoomToNode(d.target));
+
+		svgGroup.on('dbclick', (d, i) => this.props.zoomToNode(this.props.Outbreak.indexCase));
 		//Create nodes as circles
 		svgGroup
 			.selectAll('circle')
@@ -139,6 +154,7 @@ class TransmissionNetworkTree extends React.Component {
 	render() {
 		return (
 			<div>
+				<button onClick={this.props.resetZoom}>reset</button>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);
