@@ -71,21 +71,13 @@ class Transmission extends React.Component {
 			.selectAll('circle')
 			.data(this.props.data)
 			.enter()
-			.append('circle')
-			.on('mouseover', this.props.onHover)
-			.on('mouseout', this.props.offHover);
+			.append('circle');
 
 		svgGroup
 			.selectAll('circle')
 			.attr('id', d => d.Id)
 			.attr('r', 10)
-			.style('fill', (d, i) => {
-				if (this.props.hoverElement === d.Id) {
-					return '#FCBC34';
-				} else {
-					return '#5EAFC6';
-				}
-			});
+			.style('fill', '#5EAFC6');
 
 		simulation.nodes(this.props.data).on('tick', ticked);
 

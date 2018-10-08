@@ -19,15 +19,11 @@ class App extends Component {
 		super(props);
 		this.updateOnSelection = this.updateOnSelection.bind(this);
 		this.updateOutbreak = this.updateOutbreak.bind(this);
-		this.onHover = this.onHover.bind(this);
-		this.offHover = this.offHover.bind(this);
 		this.reset = this.reset.bind(this);
 		this.state = {
-			hover: 'none',
 			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
 			distributionParameters: [1.5, 3],
-			//transmissionOptions: ['Gamma', 'LogNormal'],
 			transmissionOptions: ['NegativeBinomial'],
 			transmissionSelection: 'NegativeBinomial',
 			transmissionParameters: [1.4, 0.5],
@@ -38,13 +34,7 @@ class App extends Component {
 			cases: [],
 		};
 	}
-	onHover(d) {
-		//for the tree
-		this.setState({ hover: d.Id });
-	}
-	offHover(d) {
-		this.setState({ hover: 'none' });
-	}
+
 	updateOnSelection(key, index, event, numeric = true) {
 		let newState = {};
 		const newValue = numeric ? parseFloat(event.target.value) : event.target.value;
@@ -171,19 +161,22 @@ class App extends Component {
 								/>
 							</div>
 						</div>
-						<div>
-							<div className="container">
-								<EpidemicContainer
-									data={this.state.cases}
-									size={[700, 500]}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								/>
-								<Clockyness
-									size={[700, 500]}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-									Outbreak={this.state.transmissionTree}
-								/>
+						<div className="container">
+							<div>
+								<h2> Outbreak characteristics</h2>
 							</div>
+							<EpidemicContainer
+								data={this.state.cases}
+								size={[700, 500]}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+							/>
+							<Clockyness
+								size={[700, 500]}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								Outbreak={this.state.transmissionTree}
+							/>
+						</div>
+						<div>
 							<div>
 								<div className="inner">
 									{/*<PhyloTree
@@ -193,9 +186,6 @@ class App extends Component {
 									/>*/}
 									<h1>Transmission tree</h1>
 									<TransmissionNetworkTree
-										hoverElement={this.state.hover}
-										onHover={this.onHover}
-										offHover={this.offHover}
 										size={[1500, 800]}
 										data={this.state.cases}
 										Outbreak={this.state.transmissionTree}

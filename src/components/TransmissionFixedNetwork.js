@@ -124,13 +124,6 @@ class TransmissionNetworkTree extends React.Component {
 			''
 		);
 		svgGroup.select('.y').remove();
-		// .style('fill', (d, i) => {
-		// 	if (this.props.hoverElement === d.Id) {
-		// 		return '#FCBC34';
-		// 	} else {
-		// 		return '#5EAFC6';
-		// 	}
-		// });
 	}
 
 	render() {

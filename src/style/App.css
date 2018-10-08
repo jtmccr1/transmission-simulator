@@ -33,6 +33,7 @@
 .container {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
 	padding-left: 1%;
 	padding-top: 5%;
 }
@@ -40,7 +41,7 @@
 	width: 500px;
 }
 .container > div {
-	flex-grow: 1; /*grow*/
+	flex-grow: 100; /*grow*/
 }
 
 .inner {

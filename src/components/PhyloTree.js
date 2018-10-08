@@ -116,13 +116,6 @@ class PhyloTree extends React.Component {
 		svgGroup.selectAll('.branch').on('mouseout', function(d, i) {
 			d3.select(this).attr('stroke-width', 2);
 		});
-		// .style('fill', (d, i) => {
-		// 	if (this.props.hoverElement === d.Id) {
-		// 		return '#FCBC34';
-		// 	} else {
-		// 		return '#5EAFC6';
-		// 	}
-		// });
 	}
 
 	render() {
