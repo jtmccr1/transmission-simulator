@@ -20,6 +20,7 @@ class App extends Component {
 		this.updateOnSelection = this.updateOnSelection.bind(this);
 		this.updateOutbreak = this.updateOutbreak.bind(this);
 		this.reset = this.reset.bind(this);
+		this.selectSample = this.selectSample.bind(this);
 		this.state = {
 			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
@@ -32,9 +33,22 @@ class App extends Component {
 			transmissionTree: new Outbreak(),
 			time: 0,
 			cases: [],
+			selectedCases: [],
 		};
 	}
+	selectSample(node) {
+		const selectedCases = this.state.selectedCases;
+		if (selectedCases.map(n => n.Id).indexOf(node.Id) > -1) {
+			//remove it
+			const newSelectedCases = selectedCases.filter(x => x !== node);
+			this.setState({ selectedCases: newSelectedCases });
+		} else {
+			//add it
 
+			selectedCases.push(node);
+			this.setState({ selectedCases: selectedCases });
+		}
+	}
 	updateOnSelection(key, index, event, numeric = true) {
 		let newState = {};
 		const newValue = numeric ? parseFloat(event.target.value) : event.target.value;
@@ -97,7 +111,7 @@ class App extends Component {
 		}
 	}
 	reset() {
-		this.setState({ transmissionTree: new Outbreak(), time: 0, cases: [] });
+		this.setState({ transmissionTree: new Outbreak(), time: 0, cases: [], selectedCases: [] });
 	}
 
 	render() {
@@ -190,6 +204,8 @@ class App extends Component {
 										data={this.state.cases}
 										Outbreak={this.state.transmissionTree}
 										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+										selectedCases={this.state.selectedCases}
+										selectSample={this.selectSample}
 									/>
 								</div>
 							</div>

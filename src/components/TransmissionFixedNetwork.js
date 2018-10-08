@@ -112,7 +112,17 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.attr('fill', d => colorScale(d.mutationsFromRoot / maxMutations));
+			.style('fill', d => colorScale(d.mutationsFromRoot / maxMutations))
+			.style('stroke-width', 2)
+			.style('stroke', d => {
+				const color =
+					this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1
+						? 'red'
+						: colorScale(d.mutationsFromRoot / maxMutations);
+				return color;
+			})
+
+			.on('click', d => this.props.selectSample(d));
 
 		drawAxis(
 			svgGroup,
