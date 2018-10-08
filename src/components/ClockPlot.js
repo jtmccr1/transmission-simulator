@@ -37,7 +37,7 @@ class Clockyness extends React.Component {
 		const yScale = d3
 			.scaleLinear()
 			.range([height - this.props.margin.top - this.props.margin.bottom, this.props.margin.bottom])
-			.domain(d3.extent(processedData, d => d.expected));
+			.domain(d3.extent(processedData, d => d.y));
 		const xScale = d3
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
