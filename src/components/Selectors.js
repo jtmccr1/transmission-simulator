@@ -148,7 +148,7 @@ const Selectors = props => {
 	const transmissionSliders = transmissionSlidersOptions[props.transmissionSelection].map((x, i) => (
 		<Sliderselector {...x} key={i} />
 	));
-	const activeInfections = props.data.filter(x => !x.contactEvents).length;
+	const activeInfections = props.data.filter(x => !x.children).length;
 	const status = activeInfections === 0 ? 'Ended' : 'On going';
 
 	return (

@@ -60,13 +60,10 @@ class App extends Component {
 
 	updateOutbreak() {
 		// set random seed if this is the first call
-		if (
-			(this.state.transmissionTree.caseList.length === 1) &
-			(this.state.transmissionTree.index.contactEvents === false)
-		) {
+		if ((this.state.transmissionTree.caseList.length === 1) & !this.state.transmissionTree.index.children) {
 			seedrandom(this.state.randomSeed, { global: true });
 		}
-		let activeInfections = this.state.transmissionTree.caseList.filter(x => !x.contactEvents).length;
+		let activeInfections = this.state.transmissionTree.caseList.filter(x => !x.children).length;
 
 		if (activeInfections > 500) {
 			alert('Reacted maximum number of active infections (500)');
@@ -97,7 +94,7 @@ class App extends Component {
 				currentTime = newTree.caseList
 					.map(node => node.onset)
 					.reduce((max, cur) => Math.max(max, cur), -Infinity);
-				activeInfections = newTree.caseList.filter(x => !x.contactEvents).length;
+				activeInfections = newTree.caseList.filter(x => !x.children).length;
 			}
 			this.setState({
 				transmissionTree: newTree,

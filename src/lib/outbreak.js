@@ -21,7 +21,6 @@ export class Outbreak {
 		this.index = {
 			onset: 0,
 			level: 0,
-			contactEvents: false,
 		};
 		this.caseList = this.broadSearch();
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
@@ -146,7 +145,6 @@ export class Outbreak {
 		if (!donor.children) {
 			const numberOftransmissions = epiParameters.R0();
 			donor.children = [];
-			donor.contactEvents = true;
 			for (let i = 1; i <= numberOftransmissions; i++) {
 				const child = {
 					parent: donor,
@@ -169,7 +167,7 @@ export class Outbreak {
 	 * @param levels - the number of levels to add to the growing transmission chain.
 	 */
 	spread() {
-		this.caseList.filter(x => !x.contactEvents).map(node => this.transmit(node, this.epiParams, this.evoParams));
+		this.caseList.filter(x => !x.children).map(node => this.transmit(node, this.epiParams, this.evoParams));
 		this.update();
 	}
 
