@@ -252,11 +252,11 @@ class App extends Component {
 				)}
 				<div className="inner">
 					<LineList
-						data={this.state.cases}
 						Outbreak={this.state.transmissionTree}
 						selectSample={this.selectSample}
 						selectedCases={this.state.selectedCases}
 						time={this.state.time}
+						zoomNode={this.state.zoomNode}
 					/>
 				</div>
 			</div>

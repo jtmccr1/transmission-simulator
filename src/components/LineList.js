@@ -13,7 +13,10 @@ class LineList extends Component {
 	}
 
 	render() {
-		const dataSet = this.props.data //add an id for each node then get the parent and children id lists
+		const displayNodes = this.props.Outbreak.broadSearch(this.props.zoomNode);
+		const allData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time);
+		const processedData = allData.filter(d => displayNodes.map(e => e.Id).indexOf(d.Id) > -1);
+		const dataSet = processedData //add an id for each node then get the parent and children id lists
 			.map(node => {
 				node.onset = Number(node.onset.toFixed(2));
 				return node;
