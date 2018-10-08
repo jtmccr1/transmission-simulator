@@ -13,21 +13,6 @@ class LineList extends Component {
 	}
 
 	render() {
-		// const selectRowProp = {
-		// 	mode: 'checkbox',
-		// 	clickToSelect: true,
-		// 	onSelect: this.props.onRowSelect,
-		// 	onSelectAll: this.props.onSelectAll,
-		// 	selected: this.props.selected,
-		// 	// bgColor: (row, isSelect) => {
-		// 	// 	if (isSelect) {
-		// 	// 		const color = this.props.colors[this.props.selected.indexOf(row.SPECID) % this.props.colors.length];
-		// 	// 		return color;
-		// 	// 	}
-		// 	// 	return null;
-		// 	// },
-		// };
-
 		const dataSet = this.props.data //add an id for each node then get the parent and children id lists
 			.map(node => {
 				node.onset = Number(node.onset.toFixed(2));
@@ -50,15 +35,22 @@ class LineList extends Component {
 				return node;
 			});
 
-		const options = {
-			sortName: 'onset',
-			sortOrder: 'asec',
+		const selectedRow = dataSet
+			.filter(d => this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1)
+			.map(d => d.Id);
+		const selectRowProp = {
+			mode: 'checkbox',
+			clickToSelect: true, // enable click to select
+			bgColor: 'red',
+			onSelect: this.props.selectSample,
+			//onSelectAll: onSelectAll,
+			selected: selectedRow,
 		};
 
 		return (
 			<div>
 				<h2> {`Line List ( ${dataSet.length} cases) `} </h2>
-				<BootstrapTable data={dataSet} exportCSV striped>
+				<BootstrapTable data={dataSet} selectRow={selectRowProp} exportCSV striped>
 					<TableHeaderColumn isKey dataField="Id" dataSort width="100" {...textColumn}>
 						Id
 					</TableHeaderColumn>

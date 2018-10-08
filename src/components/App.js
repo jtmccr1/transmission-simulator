@@ -14,6 +14,7 @@ import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
 import Clockyness from './ClockPlot';
+import on from 'd3-selection/src/selection/on';
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -21,6 +22,7 @@ class App extends Component {
 		this.updateOutbreak = this.updateOutbreak.bind(this);
 		this.reset = this.reset.bind(this);
 		this.selectSample = this.selectSample.bind(this);
+		this.onRowSelect = this.onRowSelect.bind(this);
 		this.state = {
 			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
@@ -49,6 +51,23 @@ class App extends Component {
 			this.setState({ selectedCases: selectedCases });
 		}
 	}
+
+	onRowSelect(row, isSelected, e) {
+		console.log(row);
+	}
+
+	// function onSelectAll(isSelected, rows) {
+	// 	alert(`is select all: ${isSelected}`);
+	// 	if (isSelected) {
+	// 		alert('Current display and selected data: ');
+	// 	} else {
+	// 		alert('unselect rows: ');
+	// 	}
+	// 	for (let i = 0; i < rows.length; i++) {
+	// 		alert(rows[i].id);
+	// 	}
+	// }
+
 	updateOnSelection(key, index, event, numeric = true) {
 		let newState = {};
 		const newValue = numeric ? parseFloat(event.target.value) : event.target.value;
@@ -215,7 +234,12 @@ class App extends Component {
 					<div />
 				)}
 				<div className="inner">
-					<LineList data={this.state.cases} Outbreak={this.state.transmissionTree} />
+					<LineList
+						data={this.state.cases}
+						Outbreak={this.state.transmissionTree}
+						selectSample={this.selectSample}
+						selectedCases={this.state.selectedCases}
+					/>
 				</div>
 			</div>
 		);
