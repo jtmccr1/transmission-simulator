@@ -32,7 +32,7 @@ class App extends Component {
 			transmissionSelection: 'NegativeBinomial',
 			transmissionParameters: [1.4, 0.5],
 			randomSeed: 10,
-			addDays: 5,
+			addDays: 20,
 			transmissionTree: new Outbreak(),
 			time: 0,
 			cases: [],

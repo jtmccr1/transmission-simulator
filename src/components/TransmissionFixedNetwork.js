@@ -105,7 +105,6 @@ class TransmissionNetworkTree extends React.Component {
 		svgGroup
 			.selectAll('.branch')
 			.on('mouseover', function(d, i) {
-				console.log(this);
 				d3.select(this).attr('stroke-width', 5);
 			})
 			.on('mouseout', function(d, i) {
