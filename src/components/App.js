@@ -6,7 +6,7 @@ import NumberofTransmissions from './NumberofTransmissions';
 import SerialIntervalTest from './SerialIntervalTest';
 import NumberofTransmissionsTest from './NumberofTransmissionsTest';
 import TransmissionNetworkTree from './TransmissionFixedNetwork';
-import PhyloTree from './PhyloTree';
+import SelectedPhyloTree from './PhyloTree';
 import LineList from './LineList';
 import EpidemicContainer from './EpidemicContainer';
 import { pdfFunctions, sampleDistribution, NegBinSample, meanFunctions } from '../lib/commonFunctions';
@@ -236,12 +236,21 @@ class App extends Component {
 					<div />
 				)}
 				{this.state.selectedCases.length > 1 ? (
-					<div>
+					<div className="container">
 						<div>
 							<h3>Selected samples</h3>
 						</div>
-						<div className="inner">
+						<div>
 							<SelectedTransmissionNetwork
+								size={[700, 500]}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								Outbreak={this.state.transmissionTree}
+								selectedCases={this.state.selectedCases}
+								time={this.state.time}
+							/>
+						</div>
+						<div>
+							<SelectedPhyloTree
 								size={[700, 500]}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								Outbreak={this.state.transmissionTree}
