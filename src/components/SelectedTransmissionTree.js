@@ -81,7 +81,7 @@ class SelectedTransmissionNetwork extends React.Component {
 		const xScale = d3
 			.scaleLinear()
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
-			.domain([0, d3.max(processedData, d => d.onset)]);
+			.domain([d3.min(processedData, d => d.onset), d3.max(processedData, d => d.onset)]);
 
 		const colorScale = d3.scaleSequential(d3.interpolateViridis);
 
@@ -159,6 +159,7 @@ class SelectedTransmissionNetwork extends React.Component {
 	render() {
 		return (
 			<div>
+				<h4>Selected transmission tree</h4>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);
