@@ -16,42 +16,42 @@ class SelectedPhyloTree extends React.Component {
 	drawTransPlot() {
 		// get sub tree from samples -
 
-		function positionNodes(selectedCases, subtreeParents, tree) {
-			//Get selected Cases that are not ancesters to any othe selected nodes
-			const externalCases = selectedCases.filter(x => subtreeParents.map(d => d.Id).indexOf(x.Id) === -1);
-			// external nodes get assigned height in 0-1.
-			// external nodes are taken from the nodelist which is preorder traversal
+		// function positionNodes(selectedCases, subtreeParents, tree) {
+		// 	//Get selected Cases that are not ancesters to any othe selected nodes
+		// 	const externalCases = selectedCases.filter(x => subtreeParents.map(d => d.Id).indexOf(x.Id) === -1);
+		// 	// external nodes get assigned height in 0-1.
+		// 	// external nodes are taken from the nodelist which is preorder traversal
 
-			const numberOfExternalNodes = externalCases.length - 1;
+		// 	const numberOfExternalNodes = externalCases.length - 1;
 
-			let postOrder = [...tree.postorder()].map(x => x.Id);
-			const externalNodes = externalCases.sort((a, b) => {
-				return postOrder.indexOf(a.Id) - postOrder.indexOf(b.Id);
-			});
+		// 	let postOrder = [...tree.postorder()].map(x => x.Id);
+		// 	const externalNodes = externalCases.sort((a, b) => {
+		// 		return postOrder.indexOf(a.Id) - postOrder.indexOf(b.Id);
+		// 	});
 
-			for (const [i, node] of externalNodes.entries()) {
-				//  x and y are in [0,1]
-				node.subY = i / numberOfExternalNodes; // Other axis width?
-				//node.mutationsFromRoot = tree.rootToTipMutations(node);
-			}
-			// internal nodes get the mean height of their childern
-			const internalNodes = [...selectedCases, ...subtreeParents].filter(
-				d => externalCases.map(x => x.Id).indexOf(d.Id) === -1
-			);
-			internalNodes.sort((a, b) => {
-				return postOrder.indexOf(a.Id) - postOrder.indexOf(b.Id);
-			});
-			for (const node of internalNodes) {
-				// maintains order of the main tree
-				if (node.children && node.children.length > 0) {
-					const childrenInSubtree = node.children.filter(
-						x => [...selectedCases, ...subtreeParents].map(d => d.Id).indexOf(x.Id) > -1
-					);
-					node.subY = d3.mean(childrenInSubtree, kid => kid.subY);
-					//node.mutationsFromRoot = tree.rootToTipMutations(node);
-				}
-			}
-		}
+		// 	for (const [i, node] of externalNodes.entries()) {
+		// 		//  x and y are in [0,1]
+		// 		node.subY = i / numberOfExternalNodes; // Other axis width?
+		// 		//node.mutationsFromRoot = tree.rootToTipMutations(node);
+		// 	}
+		// 	// internal nodes get the mean height of their childern
+		// 	const internalNodes = [...selectedCases, ...subtreeParents].filter(
+		// 		d => externalCases.map(x => x.Id).indexOf(d.Id) === -1
+		// 	);
+		// 	internalNodes.sort((a, b) => {
+		// 		return postOrder.indexOf(a.Id) - postOrder.indexOf(b.Id);
+		// 	});
+		// 	for (const node of internalNodes) {
+		// 		// maintains order of the main tree
+		// 		if (node.children && node.children.length > 0) {
+		// 			const childrenInSubtree = node.children.filter(
+		// 				x => [...selectedCases, ...subtreeParents].map(d => d.Id).indexOf(x.Id) > -1
+		// 			);
+		// 			node.subY = d3.mean(childrenInSubtree, kid => kid.subY);
+		// 			//node.mutationsFromRoot = tree.rootToTipMutations(node);
+		// 		}
+		// 	}
+		// }
 
 		const mrca = this.props.Outbreak.MRCA(this.props.selectedCases);
 		let subtreeParents = [mrca];
@@ -65,7 +65,7 @@ class SelectedPhyloTree extends React.Component {
 			}
 		}
 
-		positionNodes(this.props.selectedCases, subtreeParents, this.props.Outbreak);
+		//positionNodes(this.props.selectedCases, subtreeParents, this.props.Outbreak);
 		const processedData = [...this.props.selectedCases, ...subtreeParents].filter(x => x.onset <= this.props.time);
 		//positionNodes(subtree);
 		const node = this.node;
@@ -104,7 +104,7 @@ class SelectedPhyloTree extends React.Component {
 		svgGroup
 			.selectAll('.line')
 			.data(
-				processedData.filter(d => d.Id !== mrca.Id).map(n => {
+				processedData.filter(d => d.Id !== this.props.Outbreak.indexCase.Id).map(n => {
 					//processedData.map(n => {
 					return {
 						target: n,
@@ -162,7 +162,7 @@ class SelectedPhyloTree extends React.Component {
 	render() {
 		return (
 			<div>
-				<h4>Selected phylogenetic tree</h4>
+				<h4>Selected "phylogenetic" tree</h4>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);
