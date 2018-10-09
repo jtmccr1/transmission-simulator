@@ -174,14 +174,30 @@ export class Outbreak {
 	 */
 	spread() {
 		const transmitters = this.caseList.filter(x => !x.futureChildren);
-		const transmitted = this.caseList.filter(x => x.futureChildren && !x.children);
+		const transmitted = this.caseList.filter(x => x.futureChildren && x.futureChildren.length>0);
 		transmitters.map(node => this.transmit(node, this.epiParams, this.evoParams));
-		for (const node of [...transmitters, ...transmitted]) {
+		for (const node of transmitters) {
 			if (node.futureChildren.length === 0) {
 				node.children = [];
-			} else if (node.futureChildren.reduce((acc, curr) => Math.min(acc, curr.onset), Infinity) <= this.time) {
+			} else if (node.futureChildren.length>0) {
 				//there are some that transmitted in the time
-				node.children = [];
+				if(!node.children){
+					node.children = [];
+				}
+				for (const child of node.futureChildren) {
+					if (child.onset <= this.time) {
+						node.children.push(child);
+					}
+				}
+				node.futureChildren = node.futureChildren.filter(kid => kid.onset > this.time);
+			}
+		}
+		for(const node of transmitted){
+			if (node.futureChildren.length>0) {
+				//there are some that transmitted in the time
+				if(!node.children){
+					node.children = [];
+				}
 				for (const child of node.futureChildren) {
 					if (child.onset <= this.time) {
 						node.children.push(child);
