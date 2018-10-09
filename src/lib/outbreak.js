@@ -50,9 +50,9 @@ export class Outbreak {
 		return this.epiParams;
 	}
 	update() {
-		this.caseList = this.broadSearch().sort((a, b) => a.onset - b.onset);
+		this.caseList = this.broadSearch();
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
-		this.caseList.forEach((n, index) => (n.Id = `case ${index}`));
+		this.caseList.sort((a, b) => a.onset - b.onset).forEach((n, index) => (n.Id = `case ${index}`));
 	}
 	// /**
 	//  * Returns a case from its key (a unique Symbol) stored in
@@ -172,22 +172,22 @@ export class Outbreak {
 	 * to the outbreak. It starts at the most recent level.
 	 * @param levels - the number of levels to add to the growing transmission chain.
 	 */
-	spread(time) {
-		this.time = this.time + time;
-		this.caseList.filter(x => !x.futureChildren).map(node => this.transmit(node, this.epiParams, this.evoParams));
-		for (const node of this.caseList) {
+	spread() {
+		const transmitters = this.caseList.filter(x => !x.futureChildren);
+		const transmitted = this.caseList.filter(x => x.futureChildren && !x.children);
+		transmitters.map(node => this.transmit(node, this.epiParams, this.evoParams));
+		for (const node of [...transmitters, ...transmitted]) {
 			if (node.futureChildren.length === 0) {
 				node.children = [];
 			} else if (node.futureChildren.reduce((acc, curr) => Math.min(acc, curr.onset), Infinity) <= this.time) {
 				//there are some that transmitted in the time
 				node.children = [];
-				let i = 0;
 				for (const child of node.futureChildren) {
 					if (child.onset <= this.time) {
 						node.children.push(child);
 					}
-					node.futureChildren.filter(kid => kid.onset > this.time);
 				}
+				node.futureChildren = node.futureChildren.filter(kid => kid.onset > this.time);
 			}
 		}
 		this.update();

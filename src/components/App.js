@@ -98,18 +98,15 @@ class App extends Component {
 				rate: (0.01 * 3000) / 365,
 			};
 
-			let currentTime = this.state.time;
-			const targetTime = currentTime + this.state.addDays;
-			while (
-				(currentTime < targetTime) &
-				(newTree.caseList.filter(x => !x.children).length > 0) &
-				(activeInfections < 500)
-			) {
-				newTree.spread(targetTime);
-				currentTime = newTree.caseList
-					.map(node => node.onset)
-					.reduce((max, cur) => Math.max(max, cur), -Infinity);
+			const targetTime = this.state.time + this.state.addDays;
+			//Fix this!
+			newTree.time = targetTime;
+			let needSpread = newTree.caseList.filter(node => !node.futureChildren || !node.children).length;
+			while ((needSpread > 0) & (activeInfections < 500)) {
+				newTree.spread();
+
 				activeInfections = newTree.caseList.filter(x => !x.children).length;
+				needSpread = newTree.caseList.filter(node => !node.futureChildren).length;
 			}
 			this.setState({
 				transmissionTree: newTree,
