@@ -83,7 +83,7 @@ class Clockyness extends React.Component {
 	render() {
 		return (
 			<div>
-				<h3>Evolution rate vs. expectation (red)</h3>
+				<h3>Evolution rate vs. expectation (blue)</h3>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);

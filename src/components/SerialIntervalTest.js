@@ -25,11 +25,12 @@ class SerialIntervalTest extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = this.props.Outbreak.caseList.filter(x => x.onset <= this.props.time && x.parent).map(x => {
+		const data = this.props.Outbreak.caseList.filter(x=>x.parent &&  x.futureChildren.length===0).map(x => {
 			return x.onset - x.parent.onset;
 		});
-
-		// popuate data
+		// const data = this.props.Outbreak.caseList.filter(x=>x.parent).map(x => {
+		// 	return x.onset - x.parent.onset;
+		// });		// popuate data
 		// line chart based on http://bl.ocks.org/mbostock/3883245
 		const xScale = d3
 			.scaleLinear()
@@ -73,7 +74,7 @@ class SerialIntervalTest extends React.Component {
 			);
 	}
 	render() {
-		const data = this.props.Outbreak.caseList.filter(x => x.parent).map(x => {
+		const data = this.props.Outbreak.caseList.filter(x => x.parent && x.futureChildren.length===0).map(x => {
 			return x.onset - x.parent.onset;
 		});
 		return (

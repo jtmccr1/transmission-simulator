@@ -15,6 +15,12 @@ import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
 import Clockyness from './ClockPlot';
 import SelectedTransmissionNetwork from './SelectedTransmissionTree';
+
+//https://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript
+const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+const TwobigPlot= [w*0.4,h*0.5]
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -153,7 +159,7 @@ class App extends Component {
 					</div>
 					<div>
 						<SerialInterval
-							size={[700, 500]}
+							size={TwobigPlot}
 							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 							params={this.state.distributionParameters}
 							pdf={pdfFunctions[this.state.distributionSelection]}
@@ -162,7 +168,7 @@ class App extends Component {
 					</div>
 					<div>
 						<NumberofTransmissions
-							size={[700, 500]}
+							size={TwobigPlot}
 							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 							params={this.state.transmissionParameters}
 							pdf={pdfFunctions[this.state.transmissionSelection]}
@@ -177,16 +183,16 @@ class App extends Component {
 							</div>
 							<div>
 								<SerialIntervalTest
-									size={[700, 500]}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+							size={TwobigPlot}
+							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									Outbreak={this.state.transmissionTree}
 									time={this.state.time}
 								/>
 							</div>
 							<div>
 								<NumberofTransmissionsTest
-									size={[700, 500]}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+							size={TwobigPlot}
+							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									Outbreak={this.state.transmissionTree}
 									time={this.state.time}
 								/>
@@ -194,16 +200,16 @@ class App extends Component {
 						</div>
 						<div className="container">
 							<div>
-								<h2> Outbreak characteristics</h2>
+								<h2> Characteristics</h2>
 							</div>
 							<EpidemicContainer
 								Outbreak={this.state.transmissionTree}
-								size={[700, 500]}
+								size={TwobigPlot}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								time={this.state.time}
 							/>
 							<Clockyness
-								size={[700, 500]}
+								size={TwobigPlot}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								Outbreak={this.state.transmissionTree}
 								time={this.state.time}
@@ -216,7 +222,7 @@ class App extends Component {
 								<div className="inner">
 									<h1>Transmission tree</h1>
 									<TransmissionNetworkTree
-										size={[1500, 800]}
+										size={[w*0.9, h*0.9]}
 										data={this.state.cases}
 										Outbreak={this.state.transmissionTree}
 										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
@@ -241,7 +247,7 @@ class App extends Component {
 						</div>
 						<div>
 							<SelectedTransmissionNetwork
-								size={[700, 500]}
+								size={TwobigPlot}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								Outbreak={this.state.transmissionTree}
 								selectedCases={this.state.selectedCases}
@@ -250,8 +256,8 @@ class App extends Component {
 						</div>
 						<div>
 							<SelectedPhyloTree
-								size={[700, 500]}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+							size={TwobigPlot}
+							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								Outbreak={this.state.transmissionTree}
 								selectedCases={this.state.selectedCases}
 								time={this.state.time}
