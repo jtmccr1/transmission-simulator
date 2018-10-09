@@ -99,7 +99,6 @@ class App extends Component {
 			};
 
 			const targetTime = this.state.time + this.state.addDays;
-			//Fix this!
 			newTree.time = targetTime;
 			let needSpread = newTree.caseList.filter(node => !node.futureChildren || !node.children).length;
 			while ((needSpread > 0) & (activeInfections < 500)) {
