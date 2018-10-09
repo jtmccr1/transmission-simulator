@@ -27,7 +27,7 @@ export class Outbreak {
 		this.evoParams = evoParams;
 
 		this.index = index;
-
+		this.time = 0;
 		this.caseList = this.broadSearch();
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
 		this.caseList.forEach((n, index) => (n.Id = n.Id ? n.Id : `case ${index}`));
@@ -148,9 +148,9 @@ export class Outbreak {
 			}
 		};
 		// How many transmissions with this case have
-		if (!donor.children) {
+		if (!donor.futureChildren) {
 			const numberOftransmissions = epiParameters.R0();
-			donor.children = [];
+			donor.futureChildren = [];
 			for (let i = 1; i <= numberOftransmissions; i++) {
 				const child = {
 					parent: donor,
@@ -160,7 +160,7 @@ export class Outbreak {
 				child.branchLengthTime = child.onset - donor.onset;
 				child.mutations = samplePoisson(evoParams.rate * child.branchLengthTime);
 				child.branchLength = child.mutations / evoParams.genomeLength;
-				donor.children.push(child);
+				donor.futureChildren.push(child);
 			}
 		} else {
 			console.log(`Already seen node: ${donor.Id}`);
@@ -172,8 +172,23 @@ export class Outbreak {
 	 * to the outbreak. It starts at the most recent level.
 	 * @param levels - the number of levels to add to the growing transmission chain.
 	 */
-	spread() {
-		this.caseList.filter(x => !x.children).map(node => this.transmit(node, this.epiParams, this.evoParams));
+	spread(time = Infinity) {
+		this.caseList.filter(x => !x.futureChildren).map(node => this.transmit(node, this.epiParams, this.evoParams));
+		for (const node of this.caseList) {
+			if (node.futureChildren.length === 0) {
+				node.children = [];
+			} else if (node.futureChildren.reduce((acc, curr) => Math.min(acc, curr.onset), Infinity) <= time) {
+				//there are some that transmitted in the time
+				node.children = [];
+				let i = 0;
+				for (const child of node.futureChildren) {
+					if (child.onset <= time) {
+						node.children.push(child);
+					}
+					node.futureChildren.filter(kid => kid.onset > time);
+				}
+			}
+		}
 		this.update();
 	}
 
