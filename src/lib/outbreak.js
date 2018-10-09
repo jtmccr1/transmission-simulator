@@ -30,7 +30,7 @@ export class Outbreak {
 		this.time = 0;
 		this.caseList = this.broadSearch();
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
-		this.caseList.forEach((n, index) => (n.Id = n.Id ? n.Id : `case ${index}`));
+		this.caseList.sort((a, b) => a.onset - b.onset).forEach((n, index) => (n.Id = `case ${index}`));
 		//this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
 	}
 	/**
@@ -50,7 +50,7 @@ export class Outbreak {
 		return this.epiParams;
 	}
 	update() {
-		this.caseList = this.broadSearch();
+		this.caseList = this.broadSearch().sort((a, b) => a.onset - b.onset);
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
 		this.caseList.forEach((n, index) => (n.Id = `case ${index}`));
 	}
@@ -172,20 +172,21 @@ export class Outbreak {
 	 * to the outbreak. It starts at the most recent level.
 	 * @param levels - the number of levels to add to the growing transmission chain.
 	 */
-	spread(time = Infinity) {
+	spread(time) {
+		this.time = this.time + time;
 		this.caseList.filter(x => !x.futureChildren).map(node => this.transmit(node, this.epiParams, this.evoParams));
 		for (const node of this.caseList) {
 			if (node.futureChildren.length === 0) {
 				node.children = [];
-			} else if (node.futureChildren.reduce((acc, curr) => Math.min(acc, curr.onset), Infinity) <= time) {
+			} else if (node.futureChildren.reduce((acc, curr) => Math.min(acc, curr.onset), Infinity) <= this.time) {
 				//there are some that transmitted in the time
 				node.children = [];
 				let i = 0;
 				for (const child of node.futureChildren) {
-					if (child.onset <= time) {
+					if (child.onset <= this.time) {
 						node.children.push(child);
 					}
-					node.futureChildren.filter(kid => kid.onset > time);
+					node.futureChildren.filter(kid => kid.onset > this.time);
 				}
 			}
 		}

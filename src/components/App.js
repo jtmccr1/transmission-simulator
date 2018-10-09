@@ -105,7 +105,7 @@ class App extends Component {
 				(newTree.caseList.filter(x => !x.children).length > 0) &
 				(activeInfections < 500)
 			) {
-				newTree.spread();
+				newTree.spread(targetTime);
 				currentTime = newTree.caseList
 					.map(node => node.onset)
 					.reduce((max, cur) => Math.max(max, cur), -Infinity);
