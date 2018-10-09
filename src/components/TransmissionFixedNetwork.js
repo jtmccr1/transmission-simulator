@@ -154,7 +154,7 @@ class TransmissionNetworkTree extends React.Component {
 	render() {
 		return (
 			<div>
-				<button onClick={this.props.resetZoom}>reset</button>
+				<button onClick={this.props.resetZoom}>Reset View</button>
 				<svg ref={node => (this.node = node)} width={this.props.size[0]} height={this.props.size[1]} />
 			</div>
 		);

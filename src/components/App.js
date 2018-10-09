@@ -14,7 +14,6 @@ import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
 import Clockyness from './ClockPlot';
-import on from 'd3-selection/src/selection/on';
 import SelectedTransmissionNetwork from './SelectedTransmissionTree';
 class App extends Component {
 	constructor(props) {
@@ -240,14 +239,19 @@ class App extends Component {
 					<div />
 				)}
 				{this.state.selectedCases.length > 1 ? (
-					<div className="inner">
-						<SelectedTransmissionNetwork
-							size={[700, 500]}
-							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-							Outbreak={this.state.transmissionTree}
-							selectedCases={this.state.selectedCases}
-							time={this.state.time}
-						/>
+					<div>
+						<div>
+							<h3>Selected samples</h3>
+						</div>
+						<div className="inner">
+							<SelectedTransmissionNetwork
+								size={[700, 500]}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								Outbreak={this.state.transmissionTree}
+								selectedCases={this.state.selectedCases}
+								time={this.state.time}
+							/>
+						</div>
 					</div>
 				) : (
 					<div />

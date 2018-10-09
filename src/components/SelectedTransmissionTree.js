@@ -15,15 +15,30 @@ class SelectedTransmissionNetwork extends React.Component {
 	}
 	drawTransPlot() {
 		// get sub tree from samples -
+		function* postorderSubtree(startNode, subtreeNodes) {
+			// want to restrict the search to only selected nodes
+			const traverse = function*(node, subtreeNodes) {
+				if (node.children) {
+					const childrenInSubtree = node.children.filter(x => subtreeNodes.map(d => d.Id).indexOf(x.Id) > -1);
+					for (const child of childrenInSubtree) {
+						yield* traverse(child, subtreeNodes);
+					}
+				}
+				yield node;
+			};
 
-		function positionNodes(tree) {
+			yield* traverse(startNode, subtreeNodes);
+		}
+		function positionNodes(mrca, selectedCases, subtreeParents, tree) {
+			//Get selected Cases that are not ancesters to any othe selected nodes
+			const externalCases = selectedCases.filter(x => subtreeParents.map(d => d.Id).indexOf(x.Id) === -1);
 			// external nodes get assigned height in 0-1.
 			// external nodes are taken from the nodelist which is preorder traversal
-			const numberOfExternalNodes = tree.externalCases.length;
-			// Here we get the order based on a current traversal
-			tree.order(tree.index);
-			let postOrder = [...tree.postorder()];
-			const externalNodes = tree.externalCases.sort((a, b) => {
+
+			const numberOfExternalNodes = externalCases.length;
+
+			let postOrder = [...postorderSubtree(mrca, [...selectedCases, ...subtreeParents])];
+			const externalNodes = externalCases.sort((a, b) => {
 				return postOrder.indexOf(a) - postOrder.indexOf(b);
 			});
 
@@ -35,28 +50,33 @@ class SelectedTransmissionNetwork extends React.Component {
 			// internal nodes get the mean height of their childern
 			for (const node of [...tree.postorder()]) {
 				if (node.children && node.children.length > 0) {
-					node.y = d3.mean(node.children, kid => kid.y);
+					const childrenInSubtree = node.children.filter(
+						x => [...selectedCases, ...subtreeParents].map(d => d.Id).indexOf(x.Id) > -1
+					);
+					node.y = d3.mean(childrenInSubtree, kid => kid.y);
 					node.mutationsFromRoot = tree.rootToTipMutations(node);
 				}
 			}
 		}
-		const subtree = this.props.Outbreak.subtree(this.props.selectedCases);
-		// positionNodes(this.props.Outbreak)
-		positionNodes(subtree);
+
+		const mrca = this.props.Outbreak.MRCA(this.props.selectedCases);
+		let subtreeParents = [mrca];
+		for (const node of this.props.selectedCases) {
+			let currentNode = node.parent;
+			while (currentNode !== mrca) {
+				subtreeParents.push(currentNode);
+				currentNode = currentNode.parent;
+			}
+		}
+
+		positionNodes(mrca, this.props.selectedCases, subtreeParents, this.props.Outbreak);
+		const processedData = [...this.props.selectedCases, ...subtreeParents].filter(x => x.onset <= this.props.time);
+		//positionNodes(subtree);
 		const node = this.node;
 		const width = this.props.size[0];
 		const height = this.props.size[1];
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const processedData = subtree.caseList.filter(x => x.onset <= this.props.time);
-		let selectedPath = [...this.props.selectedCases];
-		for (const node of this.props.selectedCases) {
-			let currentNode = node;
-			while (currentNode.parent) {
-				selectedPath.push(currentNode.parent);
-				currentNode = currentNode.parent;
-			}
-		}
 		//const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent, target: d }));
 		const yScale = d3
 			.scaleLinear()
@@ -86,7 +106,7 @@ class SelectedTransmissionNetwork extends React.Component {
 		svgGroup
 			.selectAll('.line')
 			.data(
-				processedData.filter(n => n.Id !== subtree.indexCase.Id).map(n => {
+				processedData.filter(d => d.Id !== mrca.Id).map(n => {
 					return {
 						target: n,
 						values: [{ onset: n.parent.onset, y: n.parent.y }, { onset: n.onset, y: n.y }],
@@ -99,8 +119,7 @@ class SelectedTransmissionNetwork extends React.Component {
 			.attr('fill', 'none')
 			.attr('stroke-width', 2)
 			.attr('d', edge => makeLinePath(edge.values))
-			.style('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations))
-			.attr('stroke-opacity', d => (selectedPath.map(c => c.Id).indexOf(d.target.Id) > -1 ? 1 : 0.1));
+			.style('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations));
 
 		//Create nodes as circles
 		svgGroup
@@ -115,8 +134,17 @@ class SelectedTransmissionNetwork extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.style('fill', d => colorScale(d.mutationsFromRoot / maxMutations))
-			.attr('fill-opacity', d => (this.props.selectedCases.map(c => c.Id).indexOf(d.Id) > -1 ? 1 : 0.1));
+			.style('stroke', d => colorScale(d.mutationsFromRoot / maxMutations))
+			.style('stroke-width', 2)
+			.style(
+				'fill',
+				d =>
+					this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1
+						? colorScale(d.mutationsFromRoot / maxMutations)
+						: 'white'
+			);
+		//.attr('fill-opacity', d => (this.props.selectedCases.map(c => c.Id).indexOf(d.Id) > -1 ? 1 : 0.1));
+
 		drawAxis(
 			svgGroup,
 			xScale,
