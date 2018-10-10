@@ -30,7 +30,9 @@ class LineList extends Component {
 
 				if (!node.children) {
 					node.childrenId = 'No contacts yet';
-				} else if (node.children.length === 0) {
+				} else if ((node.children.length === 0) & (node.futureChildren.length > 0)) {
+					node.childrenId = 'No contacts yet';
+				} else if ((node.children.length === 0) & (node.futureChildren.length === 0)) {
 					node.childrenId = 'No forward transmission';
 				} else {
 					node.childrenId = node.children.reduce((all, cur) => `${all}${cur.Id}; `, '');
