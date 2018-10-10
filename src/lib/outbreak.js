@@ -32,6 +32,7 @@ export class Outbreak {
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
 		this.caseList.sort((a, b) => a.onset - b.onset).forEach((n, index) => (n.Id = `case ${index}`));
 		//this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
+		this.AllCases = [...this.postorderAll()];
 	}
 	/**
 	 * Gets the index case node of the outbreak
@@ -73,6 +74,23 @@ export class Outbreak {
 		const traverse = function*(node) {
 			if (node.children) {
 				for (const child of node.children) {
+					yield* traverse(child);
+				}
+			}
+			yield node;
+		};
+
+		yield* traverse(startNode);
+	}
+	/**
+	 * A generator function that returns the nodes in a post-order traversal.
+	 * This is borrowed from figtree.js c- Andrew Rambaut.
+	 * @returns {IterableIterator<IterableIterator<*|*>>}
+	 */
+	*postorderAll(startNode = this.index) {
+		const traverse = function*(node) {
+			if (node.futureChildren) {
+				for (const child of [...node.children, ...node.futureChildren]) {
 					yield* traverse(child);
 				}
 			}
@@ -174,14 +192,14 @@ export class Outbreak {
 	 */
 	spread() {
 		const transmitters = this.caseList.filter(x => !x.futureChildren);
-		const transmitted = this.caseList.filter(x => x.futureChildren && x.futureChildren.length>0);
+		const transmitted = this.caseList.filter(x => x.futureChildren && x.futureChildren.length > 0);
 		transmitters.map(node => this.transmit(node, this.epiParams, this.evoParams));
 		for (const node of transmitters) {
 			if (node.futureChildren.length === 0) {
 				node.children = [];
-			} else if (node.futureChildren.length>0) {
+			} else if (node.futureChildren.length > 0) {
 				//there are some that transmitted in the time
-				if(!node.children){
+				if (!node.children) {
 					node.children = [];
 				}
 				for (const child of node.futureChildren) {
@@ -192,10 +210,10 @@ export class Outbreak {
 				node.futureChildren = node.futureChildren.filter(kid => kid.onset > this.time);
 			}
 		}
-		for(const node of transmitted){
-			if (node.futureChildren.length>0) {
+		for (const node of transmitted) {
+			if (node.futureChildren.length > 0) {
 				//there are some that transmitted in the time
-				if(!node.children){
+				if (!node.children) {
 					node.children = [];
 				}
 				for (const child of node.futureChildren) {

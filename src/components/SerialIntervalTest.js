@@ -25,7 +25,7 @@ class SerialIntervalTest extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = this.props.Outbreak.caseList.map(x => x.branchLengthTime)
+		const data = [...this.props.Outbreak.postorderAll()].filter(x => x.parent).map(x => x.branchLengthTime);
 
 		// const data = this.props.Outbreak.caseList.filter(x=>x.parent).map(x => {
 		// 	return x.onset - x.parent.onset;
@@ -73,7 +73,7 @@ class SerialIntervalTest extends React.Component {
 			);
 	}
 	render() {
-		const data = this.props.Outbreak.caseList.map(x => x.branchLengthTime)
+		const data = [...this.props.Outbreak.postorderAll()].filter(x => x.parent).map(x => x.branchLengthTime);
 		return (
 			<div>
 				<div>{`Serial interval (days) (mean: ${d3.mean(data).toFixed(2)}))`}</div>

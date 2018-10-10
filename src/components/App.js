@@ -20,7 +20,7 @@ import SelectedTransmissionNetwork from './SelectedTransmissionTree';
 const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-const TwobigPlot= [w*0.4,h*0.5]
+const TwobigPlot = [w * 0.4, h * 0.5];
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -106,19 +106,18 @@ class App extends Component {
 
 			const targetTime = this.state.time + this.state.addDays;
 			newTree.time = targetTime;
-			let needSpread = newTree.caseList.filter(node => !node.futureChildren || !node.children).length;
-			while ((activeInfections > 0) & (activeInfections < 500)) {
+			let needSpread = newTree.caseList.filter(node => (node.onset < targetTime) & !node.futureChildren);
+			while ((needSpread.length > 0) & (needSpread.length < 500)) {
 				newTree.spread();
 
-				activeInfections = newTree.caseList.filter(x => !x.futureChildren || x.futureChildren.length>0).length;
-				needSpread = newTree.caseList.filter(node => !node.futureChildren).length;
+				needSpread = newTree.caseList.filter(node => (node.onset < targetTime) & !node.futureChildren);
 			}
 			this.setState({
 				transmissionTree: newTree,
 				time: targetTime,
 				cases: newTree.caseList.filter(x => x.onset <= targetTime),
 			});
-			if (activeInfections > 500) {
+			if (needSpread.length > 500) {
 				alert('Reacted maximum number of active infections(500)');
 			}
 		}
@@ -183,16 +182,16 @@ class App extends Component {
 							</div>
 							<div>
 								<SerialIntervalTest
-							size={TwobigPlot}
-							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									size={TwobigPlot}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									Outbreak={this.state.transmissionTree}
 									time={this.state.time}
 								/>
 							</div>
 							<div>
 								<NumberofTransmissionsTest
-							size={TwobigPlot}
-							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									size={TwobigPlot}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									Outbreak={this.state.transmissionTree}
 									time={this.state.time}
 								/>
@@ -222,7 +221,7 @@ class App extends Component {
 								<div className="inner">
 									<h1>Transmission tree</h1>
 									<TransmissionNetworkTree
-										size={[w*0.9, h*0.9]}
+										size={[w * 0.9, h * 0.9]}
 										data={this.state.cases}
 										Outbreak={this.state.transmissionTree}
 										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
@@ -256,8 +255,8 @@ class App extends Component {
 						</div>
 						<div>
 							<SelectedPhyloTree
-							size={TwobigPlot}
-							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+								size={TwobigPlot}
+								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 								Outbreak={this.state.transmissionTree}
 								selectedCases={this.state.selectedCases}
 								time={this.state.time}

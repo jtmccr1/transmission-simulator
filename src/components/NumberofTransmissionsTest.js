@@ -1,8 +1,6 @@
 import React from 'react';
 import * as d3 from 'd3';
-import * as R from 'ramda';
-import * as jStat from 'jStat';
-import { getData, drawAxis } from '../lib/commonFunctions';
+import { drawAxis } from '../lib/commonFunctions';
 
 class NumberofTransmissionsTest extends React.Component {
 	constructor(props) {
@@ -26,8 +24,8 @@ class NumberofTransmissionsTest extends React.Component {
 
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
-		const data = this.props.Outbreak.caseList.filter(x => x.onset <= this.props.time && x.children).map(x => {
-			return x.children.length;
+		const data = this.props.Outbreak.caseList.filter(x => x.futureChildren).map(x => {
+			return x.children.length + x.futureChildren.length;
 		});
 
 		let dataBin = [];
@@ -84,8 +82,8 @@ class NumberofTransmissionsTest extends React.Component {
 			.attr('height', d => height - this.props.margin.bottom - this.props.margin.top - yScale(d.p));
 	}
 	render() {
-		const data = this.props.Outbreak.caseList.filter(x => x.children).map(x => {
-			return x.children.length;
+		const data = this.props.Outbreak.caseList.filter(x => x.futureChildren).map(x => {
+			return x.children.length + x.futureChildren.length;
 		});
 		return (
 			<div>
