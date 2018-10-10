@@ -56,7 +56,7 @@ class SelectedPhyloTree extends React.Component {
 		const mrca = this.props.Outbreak.MRCA(this.props.selectedCases);
 		let subtreeParents = [mrca];
 		for (const node of this.props.selectedCases) {
-			if (node.parent) {
+			if (node.parent && node !== mrca) {
 				let currentNode = node.parent;
 				while (currentNode !== mrca) {
 					subtreeParents.push(currentNode);
