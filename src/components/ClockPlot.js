@@ -1,5 +1,6 @@
 import React from 'react';
 import * as d3 from 'd3';
+import regression from 'regression';
 import { drawAxis } from '../lib/commonFunctions';
 
 class Clockyness extends React.Component {
@@ -19,6 +20,11 @@ class Clockyness extends React.Component {
 		const height = this.props.size[1];
 		const svg = d3.select(node).style('font', '10px sans-serif');
 
+		const trendConfig = {
+			order: 2,
+			precision: 5,
+		};
+
 		const processedData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time).map(node => {
 			const point = {
 				x: node.onset,
@@ -26,6 +32,7 @@ class Clockyness extends React.Component {
 				expected: node.onset * (0.01 / 365),
 				node: node,
 			};
+
 			return point;
 		});
 
@@ -33,6 +40,11 @@ class Clockyness extends React.Component {
 			.line()
 			.x(d => xScale(d.x))
 			.y(d => yScale(d.expected));
+
+		const predictedLine = d3
+			.line()
+			.x(d => xScale(d[0]))
+			.y(d => yScale(d[1]));
 
 		//const edges = this.props.data.filter(d => d.parent).map(d => ({ source: d.parent, target: d }));
 		const yScale = d3
@@ -64,11 +76,14 @@ class Clockyness extends React.Component {
 			.attr('cx', d => xScale(d.x))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.style('stroke', d => {
-				const color = this.props.selectedCases.map(n => n.Id).indexOf(d.node.Id) > -1 ? 'red' : 'black';
+			.style('fill', d => {
+				const color = this.props.selectedCases.map(n => n.Id).indexOf(d.node.Id) > -1 ? 'red' : 'grey';
 				return color;
 			})
-			.style('stroke-width', 2)
+			.style('opacity', d => {
+				const color = this.props.selectedCases.map(n => n.Id).indexOf(d.node.Id) > -1 ? 1 : 0.2;
+				return color;
+			})
 			.on('click', d => this.props.selectSample(d.node));
 
 		svgGroup
@@ -76,6 +91,28 @@ class Clockyness extends React.Component {
 			.datum(processedData)
 			.attr('class', 'trendline')
 			.attr('d', expectedLine);
+
+		if (this.props.selectedCases.length > 1) {
+			const trendConfig = {
+				order: 2,
+				precision: 5,
+			};
+			const measuredTrend = regression.linear(
+				this.props.selectedCases.map(d => [d.onset, this.props.Outbreak.rootToTipLength(d)]),
+				trendConfig
+			);
+			//https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
+			function onlyUnique(value, index, self) {
+				return self.indexOf(value) === index;
+			}
+			const uniqueX = processedData.map(d => d.x).filter(onlyUnique);
+			const predictedPoints = uniqueX.map(d => measuredTrend.predict(d));
+			svgGroup
+				.append('path')
+				.datum(predictedPoints)
+				.attr('class', 'predictedLine')
+				.attr('d', predictedLine);
+		}
 
 		drawAxis(svgGroup, xScale, yScale, this.props.size, this.props.margin, 'Day of infection', 'Node Height');
 	}

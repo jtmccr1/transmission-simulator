@@ -26,3 +26,8 @@
 	stroke: lightsteelblue;
 	stroke-width: 3px;
 }
+.predictedLine {
+	fill: none;
+	stroke: red;
+	stroke-width: 3px;
+}
