@@ -82,7 +82,8 @@ class TransmissionNetworkTree extends React.Component {
 		const svgGroup = svg.select('g');
 		//Create SVG element
 		//Create edges as lines
-		const maxMutations = allData.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
+		let maxMutations = allData.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
+		maxMutations = maxMutations > 0 ? maxMutations : 1;
 		// edges
 		svgGroup
 			.selectAll('.line')

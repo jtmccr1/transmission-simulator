@@ -19,9 +19,16 @@ export class Outbreak {
 		index = {
 			onset: 0,
 			level: 0,
+			length: 0,
 		},
 		epiParams = {},
-		evoParams = {}
+		evoParams = {
+			genomeLength: 3000,
+			rateSiteYear: 0.01,
+			rate: (0.01 * 3000) / 365,
+			TsTv: 4,
+			posRate: [0.2, 0.1, 2.7],
+		}
 	) {
 		this.epiParams = epiParams;
 		this.evoParams = evoParams;
@@ -144,14 +151,14 @@ export class Outbreak {
 	get externalCases() {
 		return this.cases.filter(node => !node.children || node.children.length === 0);
 	}
+
 	/**
-	 * Returns transmitted cases from a donor case
-	 *
-	 * @param donor - the donor case, epiParameters - object keyed with R0 and serialInterval
-	 * where each entry is a function which returns a sample from a distribution.
-	 * @returns adds children to donor case if transmission occurs
+	 * draws the number of mutations out of poisson and applies those mutations to the genome
+	 * @param {*} donor
+	 * @param {*} epiParameters
+	 * @param {*} evoParams
 	 */
-	transmit(donor, epiParameters, evoParams) {
+	mutate(node) {
 		const samplePoisson = lamda => {
 			{
 				let L = Math.exp(-lamda);
@@ -165,6 +172,47 @@ export class Outbreak {
 				return k - 1;
 			}
 		};
+		// const getCodonPos = () => {
+		// 	const relativeRates = this.evoParams.posRate.map(
+		// 		x => x / this.evoParams.posRate.reduce((acc, cur) => acc + cur, 0)
+		// 	);
+		// 	const cdfRelRates = relativeRates.map((x, index) => {
+		// 		const nextIndex = index + 1;
+		// 		return relativeRates.slice(0, nextIndex).reduce((acc, cur) => acc + cur, 0);
+		// 	});
+		// 	for (let i = 0; i < node.mutations; i++) {
+		// 		drawCodonPos = Math.random();
+		// 		let pos = 0;
+		// 		let prop = cdfRelRates[pos];
+		// 		while (cdfRelRates[pos] < drawCodonPos) {
+		// 			pos++;
+		// 		}
+		// 		return pos - 1; // base0
+		// 	}
+		// };
+		// const getTsTv = () => {};
+		if (!node.mutations) {
+			node.mutations = samplePoisson(this.evoParams.rate * node.branchLengthTime);
+			// 	//make mutations
+			// 	// for loop here
+			// 	//draw codon position
+			// 	const codonPos = getCodonPos();
+			// 	//get position
+			// 	let genomePosition = Math.floor(Math.random() * (this.genome.length + 1));
+			// 	//draw until it's at the right codon position.
+			// 	while (genomePosition % 3 !== codonPos) {
+			// 		genomePosition = Math.floor(Math.random() * (this.genome.length + 1));
+			// 	}
+		}
+	}
+	/**
+	 * Returns transmitted cases from a donor case
+	 *
+	 * @param donor - the donor case, epiParameters - object keyed with R0 and serialInterval
+	 * where each entry is a function which returns a sample from a distribution.
+	 * @returns adds children to donor case if transmission occurs
+	 */
+	transmit(donor, epiParameters, evoParams) {
 		// How many transmissions with this case have
 		if (!donor.futureChildren) {
 			const numberOftransmissions = epiParameters.R0();
@@ -174,9 +222,11 @@ export class Outbreak {
 					parent: donor,
 					level: donor.level + 1,
 					onset: donor.onset + epiParameters.serialInterval(),
+					genome: donor.genome,
 				};
 				child.branchLengthTime = child.onset - donor.onset;
-				child.mutations = samplePoisson(evoParams.rate * child.branchLengthTime);
+				child.length = child.branchLength;
+				this.mutate(child);
 				child.branchLength = child.mutations / evoParams.genomeLength;
 				donor.futureChildren.push(child);
 			}
@@ -299,7 +349,21 @@ export class Outbreak {
 		}
 		return length;
 	}
-
+	/**
+	 * An instance method to return a Newick format string for the Tree. Can be called without a parameter to
+	 * start at the root node. Providing another node will generate a subtree. Labels and branch lengths are
+	 * included if available.
+	 *
+	 * @param {object} node - The node of the tree to be written (defaults as the rootNode).
+	 * @returns {string}
+	 */
+	transmissionToNewick(node = this.indexCase) {
+		return (
+			(node.children && node.children.length > 0
+				? `(${node.children.map(child => this.transmissionToNewick(child)).join(',')})${node.Id ? node.Id : ''}`
+				: node.Id) + (node.branchLengthTime ? `:${node.branchLengthTime}` : '')
+		);
+	}
 	/**
 	 * returns the most recent common ancestor of the nodes provided.
 	 * @param nodes -
@@ -348,5 +412,22 @@ export class Outbreak {
 		// }
 		//return childAncestors.filter(x => x.onset >= mcra.onset);
 		return subtreeObj;
+	}
+
+	resolve(caseNode) {
+		while (node.children.length > 2) {
+			// get first 2 children
+			let moveNodes = [];
+			// make new intermediate node
+			newIntermediate = {
+				parent: node,
+				children: [node.children.pop(), node.children.pop()],
+				length: 0,
+			};
+			for (const child of newIntermediate) {
+				child.parent = newIntermediate;
+			}
+			node.children.push(newIntermediate);
+		}
 	}
 }
