@@ -68,9 +68,6 @@ class LineList extends Component {
 					<TableHeaderColumn dataField="childrenId" dataSort width="200" {...textColumn}>
 						Recipient Contact
 					</TableHeaderColumn>
-					<TableHeaderColumn dataField="mutationsFromRoot" dataSort width="200" {...textColumn}>
-						SNP relative to root
-					</TableHeaderColumn>
 				</BootstrapTable>
 			</div>
 		);

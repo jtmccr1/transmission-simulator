@@ -164,9 +164,10 @@ export class Outbreak {
 				const child = {
 					parent: donor,
 					level: donor.level + 1,
-					onset: donor.onset + epiParameters.serialInterval(),
+					interval: donor.onset + epiParameters.serialInterval(),
 					genome: donor.genome,
 				};
+				child.onset = donor.onset + child.interval;
 				donor.futureChildren.push(child);
 			}
 		} else {
@@ -343,7 +344,7 @@ export class Outbreak {
 			const newPhyloNode = {
 				length:
 					node.children && node.children.length > 0
-						? this.sampleTime + node.children.reduce((acc, curr) => Math.max(acc, curr.onset), 0)
+						? this.sampleTime + node.children.reduce((acc, curr) => Math.max(acc, curr.interval), 0)
 						: this.sampleTime,
 				name: node.Id,
 			};
@@ -357,7 +358,7 @@ export class Outbreak {
 			// set length - should be updated if there are children to visit
 			currentPhyloNode.length =
 				node.children && node.children.length > 0
-					? this.sampleTime + node.children.reduce((acc, curr) => Math.max(acc, curr.onset), 0)
+					? this.sampleTime + node.children.reduce((acc, curr) => Math.max(acc, curr.interval), 0)
 					: currentPhyloNode.length;
 
 			let currentParentPhyloNode = currentPhyloNode.parent ? currentPhyloNode.parent : this.tree.rootNode;
@@ -368,7 +369,7 @@ export class Outbreak {
 			}
 			// else it should already be there since we're using prexisting nodes
 			if (node.children && node.children.length > 0) {
-				for (const child of node.children.sort((a, b) => a.onset - b.onset)) {
+				for (const child of node.children.sort((a, b) => a.interval - b.interval)) {
 					//remove currentPhyloNode from children
 					currentParentPhyloNode.children = currentParentPhyloNode.children.filter(
 						kid => kid !== currentPhyloNode
@@ -377,7 +378,7 @@ export class Outbreak {
 					const newInternal = {
 						parent: currentParentPhyloNode,
 						children: [],
-						length: child.onset - this.tree.rootToTipLength(currentParentPhyloNode),
+						length: child.interval - this.tree.rootToTipLength(currentParentPhyloNode),
 					};
 					// link currentParentPhyloNode to newInternal
 					currentParentPhyloNode.children.push(newInternal);
