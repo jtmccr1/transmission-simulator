@@ -21,9 +21,9 @@ class TransmissionNetworkTree extends React.Component {
 			const numberOfExternalNodes = tree.externalCases.length;
 			// Here we get the order based on a current traversal
 			tree.order(tree.index);
-			let postOrder = [...tree.postorder()];
+			let postOrder = [...tree.postorder()].map(x => x.Id);
 			const externalNodes = tree.externalCases.sort((a, b) => {
-				return postOrder.indexOf(a) - postOrder.indexOf(b);
+				return postOrder.indexOf(a.Id) - postOrder.indexOf(b.Id);
 			});
 
 			for (const [i, node] of externalNodes.entries()) {
@@ -68,8 +68,6 @@ class TransmissionNetworkTree extends React.Component {
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
 			.domain([d3.min(processedData, d => d.onset), d3.max(processedData, d => d.onset)]);
 
-		const colorScale = d3.scaleSequential(d3.interpolateViridis);
-
 		const makeLinePath = d3
 			.line()
 			.x(d => xScale(d.onset))
@@ -82,8 +80,7 @@ class TransmissionNetworkTree extends React.Component {
 		const svgGroup = svg.select('g');
 		//Create SVG element
 		//Create edges as lines
-		let maxMutations = allData.reduce((acc, cur) => Math.max(acc, cur.mutationsFromRoot), 0);
-		maxMutations = maxMutations > 0 ? maxMutations : 1;
+
 		// edges
 		svgGroup
 			.selectAll('.line')
@@ -101,7 +98,7 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('fill', 'none')
 			.attr('stroke-width', 2)
 			.attr('d', edge => makeLinePath(edge.values))
-			.attr('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations));
+			.attr('stroke', 'grey');
 
 		svgGroup
 			.selectAll('.branch')
@@ -127,13 +124,9 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
-			.style('fill', d => colorScale(d.mutationsFromRoot / maxMutations))
 			.style('stroke-width', 2)
 			.style('stroke', d => {
-				const color =
-					this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1
-						? 'red'
-						: colorScale(d.mutationsFromRoot / maxMutations);
+				const color = this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1 ? 'red' : 'black';
 				return color;
 			})
 

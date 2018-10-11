@@ -83,8 +83,6 @@ class SelectedTransmissionNetwork extends React.Component {
 			.range([this.props.margin.left, width - this.props.margin.left - this.props.margin.right])
 			.domain([d3.min(processedData, d => d.onset), d3.max(processedData, d => d.onset)]);
 
-		const colorScale = d3.scaleSequential(d3.interpolateViridis);
-
 		const makeLinePath = d3
 			.line()
 			.x(d => xScale(d.onset))
@@ -118,7 +116,7 @@ class SelectedTransmissionNetwork extends React.Component {
 			.attr('fill', 'none')
 			.attr('stroke-width', 2)
 			.attr('d', edge => makeLinePath(edge.values))
-			.style('stroke', edge => colorScale(edge.target.mutationsFromRoot / maxMutations));
+			.style('stroke', 'grey');
 
 		//Create nodes as circles
 		svgGroup
@@ -133,15 +131,9 @@ class SelectedTransmissionNetwork extends React.Component {
 			.attr('cx', d => xScale(d.onset))
 			.attr('cy', d => yScale(d.subY))
 			.attr('r', 5)
-			.style('stroke', d => colorScale(d.mutationsFromRoot / maxMutations))
 			.style('stroke-width', 2)
-			.style(
-				'fill',
-				d =>
-					this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1
-						? colorScale(d.mutationsFromRoot / maxMutations)
-						: 'white'
-			);
+			.style('stroke', 'black')
+			.style('fill', d => (this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1 ? 'black' : 'white'));
 		//.attr('fill-opacity', d => (this.props.selectedCases.map(c => c.Id).indexOf(d.Id) > -1 ? 1 : 0.1));
 
 		drawAxis(

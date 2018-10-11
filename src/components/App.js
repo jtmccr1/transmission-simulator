@@ -3,17 +3,17 @@ import seedrandom from 'seedrandom';
 import Selectors from './Selectors';
 import SerialInterval from './SerialInterval';
 import NumberofTransmissions from './NumberofTransmissions';
-import SerialIntervalTest from './SerialIntervalTest';
-import NumberofTransmissionsTest from './NumberofTransmissionsTest';
+// import SerialIntervalTest from './SerialIntervalTest';
+// import NumberofTransmissionsTest from './NumberofTransmissionsTest';
 import TransmissionNetworkTree from './TransmissionFixedNetwork';
-import SelectedPhyloTree from './PhyloTree';
+import Phylotree from './PhyloTree';
 import LineList from './LineList';
-import EpidemicContainer from './EpidemicContainer';
+// import EpidemicContainer from './EpidemicContainer';
 import { pdfFunctions, sampleDistribution, NegBinSample, meanFunctions } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
-import Clockyness from './ClockPlot';
+// import Clockyness from './ClockPlot';
 import SelectedTransmissionNetwork from './SelectedTransmissionTree';
 
 //https://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript
@@ -174,7 +174,7 @@ class App extends Component {
 				</div>
 				{this.state.transmissionTree.caseList.length > 1 ? (
 					<div>
-						<div className="container">
+						{/* <div className="container">
 							<div>
 								<h2>Empirical parameters</h2>
 							</div>
@@ -213,25 +213,35 @@ class App extends Component {
 								selectedCases={this.state.selectedCases}
 								selectSample={this.selectSample}
 							/>
-						</div>
+				</div> */}
 						<div>
-							<div>
-								<div className="inner">
-									<h1>Transmission tree</h1>
-									<TransmissionNetworkTree
-										size={[w * 0.9, h * 0.9]}
-										data={this.state.cases}
-										Outbreak={this.state.transmissionTree}
-										margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-										selectedCases={this.state.selectedCases}
-										selectSample={this.selectSample}
-										time={this.state.time}
-										zoomNode={this.state.zoomNode}
-										zoomToNode={this.zoomToNode}
-										resetZoom={this.resetZoom}
-									/>
-								</div>
+							<div className="inner">
+								<h1>Transmission tree</h1>
+								<p>{this.state.transmissionTree.transmissionToNewick()}</p>
+								<TransmissionNetworkTree
+									size={[w * 0.9, h * 0.9]}
+									data={this.state.cases}
+									Outbreak={this.state.transmissionTree}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									selectedCases={this.state.selectedCases}
+									selectSample={this.selectSample}
+									time={this.state.time}
+									zoomNode={this.state.zoomNode}
+									zoomToNode={this.zoomToNode}
+									resetZoom={this.resetZoom}
+								/>
 							</div>
+						</div>
+						<div className="inner">
+							<h1>Phylogentic time tree</h1>
+
+							<Phylotree
+								size={[w * 0.9, h * 0.9]}
+								Outbreak={this.state.transmissionTree}
+								margin={{ top: 50, right: 75, bottom: 50, left: 50 }}
+								selectedCases={this.state.selectedCases}
+								selectSample={this.selectSample}
+							/>
 						</div>
 					</div>
 				) : (
@@ -251,7 +261,7 @@ class App extends Component {
 								time={this.state.time}
 							/>
 						</div>
-						<div>
+						{/*<div>
 							<SelectedPhyloTree
 								size={TwobigPlot}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
@@ -259,14 +269,13 @@ class App extends Component {
 								selectedCases={this.state.selectedCases}
 								time={this.state.time}
 							/>
-						</div>
+						</div>*/}
 					</div>
 				) : (
 					<div />
 				)}
 
 				<div className="inner">
-					<p>{this.state.transmissionTree.transmissionToNewick()}</p>
 					<LineList
 						Outbreak={this.state.transmissionTree}
 						selectSample={this.selectSample}

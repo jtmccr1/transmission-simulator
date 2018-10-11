@@ -4,7 +4,8 @@
  * The Outbreak class. Currently the rate of transmission is constant but it could be adjusted in
  * the future. That'd be nice.
  */
-
+const Tree = require('./figtree.js').Tree;
+const jStat = require('jStat');
 export class Outbreak {
 	/**
 	 * The constructor takes a config object containing a starting seed for the outbreak,
@@ -16,23 +17,18 @@ export class Outbreak {
 	 * These are curried functions that wait for an x value, and are keyed as {infectivityCDF:,R0cdf:}
 	 */
 	constructor(
+		sampleTime = 3,
 		index = {
 			onset: 0,
 			level: 0,
-			length: 0,
 		},
 		epiParams = {},
-		evoParams = {
-			genomeLength: 3000,
-			rateSiteYear: 0.01,
-			rate: (0.01 * 3000) / 365,
-			TsTv: 4,
-			posRate: [0.2, 0.1, 2.7],
-		}
+		tree = new Tree()
 	) {
-		this.epiParams = epiParams;
-		this.evoParams = evoParams;
+		this.tree = tree;
 
+		this.sampleTime = sampleTime;
+		this.epiParams = epiParams;
 		this.index = index;
 		this.time = 0;
 		this.caseList = this.broadSearch();
@@ -60,7 +56,7 @@ export class Outbreak {
 	update() {
 		this.caseList = this.broadSearch();
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
-		this.caseList.sort((a, b) => a.onset - b.onset).forEach((n, index) => (n.Id = `case ${index}`));
+		this.caseList.sort((a, b) => a.onset - b.onset).forEach((n, index) => (n.Id = `case${index}`));
 	}
 	// /**
 	//  * Returns a case from its key (a unique Symbol) stored in
@@ -153,66 +149,13 @@ export class Outbreak {
 	}
 
 	/**
-	 * draws the number of mutations out of poisson and applies those mutations to the genome
-	 * @param {*} donor
-	 * @param {*} epiParameters
-	 * @param {*} evoParams
-	 */
-	mutate(node) {
-		const samplePoisson = lamda => {
-			{
-				let L = Math.exp(-lamda);
-				let k = 0;
-				let p = 1;
-				while (p > L) {
-					k++;
-					const u = Math.random();
-					p = u * p;
-				}
-				return k - 1;
-			}
-		};
-		// const getCodonPos = () => {
-		// 	const relativeRates = this.evoParams.posRate.map(
-		// 		x => x / this.evoParams.posRate.reduce((acc, cur) => acc + cur, 0)
-		// 	);
-		// 	const cdfRelRates = relativeRates.map((x, index) => {
-		// 		const nextIndex = index + 1;
-		// 		return relativeRates.slice(0, nextIndex).reduce((acc, cur) => acc + cur, 0);
-		// 	});
-		// 	for (let i = 0; i < node.mutations; i++) {
-		// 		drawCodonPos = Math.random();
-		// 		let pos = 0;
-		// 		let prop = cdfRelRates[pos];
-		// 		while (cdfRelRates[pos] < drawCodonPos) {
-		// 			pos++;
-		// 		}
-		// 		return pos - 1; // base0
-		// 	}
-		// };
-		// const getTsTv = () => {};
-		if (!node.mutations) {
-			node.mutations = samplePoisson(this.evoParams.rate * node.branchLengthTime);
-			// 	//make mutations
-			// 	// for loop here
-			// 	//draw codon position
-			// 	const codonPos = getCodonPos();
-			// 	//get position
-			// 	let genomePosition = Math.floor(Math.random() * (this.genome.length + 1));
-			// 	//draw until it's at the right codon position.
-			// 	while (genomePosition % 3 !== codonPos) {
-			// 		genomePosition = Math.floor(Math.random() * (this.genome.length + 1));
-			// 	}
-		}
-	}
-	/**
 	 * Returns transmitted cases from a donor case
 	 *
 	 * @param donor - the donor case, epiParameters - object keyed with R0 and serialInterval
 	 * where each entry is a function which returns a sample from a distribution.
 	 * @returns adds children to donor case if transmission occurs
 	 */
-	transmit(donor, epiParameters, evoParams) {
+	transmit(donor, epiParameters) {
 		// How many transmissions with this case have
 		if (!donor.futureChildren) {
 			const numberOftransmissions = epiParameters.R0();
@@ -224,10 +167,6 @@ export class Outbreak {
 					onset: donor.onset + epiParameters.serialInterval(),
 					genome: donor.genome,
 				};
-				child.branchLengthTime = child.onset - donor.onset;
-				child.length = child.branchLength;
-				this.mutate(child);
-				child.branchLength = child.mutations / evoParams.genomeLength;
 				donor.futureChildren.push(child);
 			}
 		} else {
@@ -394,40 +333,71 @@ export class Outbreak {
 		}
 		return currentMRCA;
 	}
-	/**
-	 * Gives subtree defined by the nodes provided back to their most recent common ancestor or all ancestors
-	 * @param nodes - the external node
-	 * @returns {oubreak object}
-	 */
-	subtree(nodes) {
-		const mcra = this.MRCA(nodes);
-		const subtreeObj = new Outbreak(mcra);
-		// const childAncestors = [...nodes];
-		// for (const child of nodes) {
-		// 	let node = child;
-		// 	while (node.parent) {
-		// 		childAncestors.push(node.parent);
-		// 		node = node.parent;
-		// 	}
-		// }
-		//return childAncestors.filter(x => x.onset >= mcra.onset);
-		return subtreeObj;
-	}
 
-	resolve(caseNode) {
-		while (node.children.length > 2) {
-			// get first 2 children
-			let moveNodes = [];
-			// make new intermediate node
-			newIntermediate = {
-				parent: node,
-				children: [node.children.pop(), node.children.pop()],
-				length: 0,
+	buildPhylo(startNode = this.indexCase) {
+		this.tree = new Tree();
+		const allNodes = [...this.preorder(startNode)];
+
+		for (const node of allNodes) {
+			//just in case
+			const newPhyloNode = {
+				length:
+					node.children && node.children.length > 0
+						? this.sampleTime + node.children.reduce((acc, curr) => Math.max(acc, curr.onset), 0)
+						: this.sampleTime,
+				name: node.Id,
 			};
-			for (const child of newIntermediate) {
-				child.parent = newIntermediate;
+			// check if there is phylogenetic node for this sample
+
+			const currentPhyloNode =
+				this.tree.nodeList.filter(x => x.name === node.Id).length === 1
+					? this.tree.nodeList.filter(x => x.name === node.Id)[0]
+					: newPhyloNode;
+
+			// set length - should be updated if there are children to visit
+			currentPhyloNode.length =
+				node.children && node.children.length > 0
+					? this.sampleTime + node.children.reduce((acc, curr) => Math.max(acc, curr.onset), 0)
+					: currentPhyloNode.length;
+
+			let currentParentPhyloNode = currentPhyloNode.parent ? currentPhyloNode.parent : this.tree.rootNode;
+
+			if (currentParentPhyloNode === this.tree.rootNode) {
+				// add the child
+				currentParentPhyloNode.children = [currentPhyloNode];
 			}
-			node.children.push(newIntermediate);
+			// else it should already be there since we're using prexisting nodes
+			if (node.children && node.children.length > 0) {
+				for (const child of node.children.sort((a, b) => a.onset - b.onset)) {
+					//remove currentPhyloNode from children
+					currentParentPhyloNode.children = currentParentPhyloNode.children.filter(
+						kid => kid !== currentPhyloNode
+					);
+					// Initiate new internal node
+					const newInternal = {
+						parent: currentParentPhyloNode,
+						children: [],
+						length: child.onset - this.tree.rootToTipLength(currentParentPhyloNode),
+					};
+					// link currentParentPhyloNode to newInternal
+					currentParentPhyloNode.children.push(newInternal);
+					//make transmissionchild
+					const childPhyloNode = {
+						parent: newInternal,
+						length: this.sampleTime,
+						name: child.Id,
+					};
+					// add to newInternal children
+					newInternal.children.push(childPhyloNode);
+					newInternal.children.push(currentPhyloNode);
+
+					currentPhyloNode.parent = newInternal;
+					currentPhyloNode.length = currentPhyloNode.length - newInternal.length;
+					currentParentPhyloNode = newInternal;
+
+					this.tree.update();
+				}
+			}
 		}
 	}
 }
