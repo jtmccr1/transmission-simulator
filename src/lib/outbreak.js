@@ -164,7 +164,7 @@ export class Outbreak {
 				const child = {
 					parent: donor,
 					level: donor.level + 1,
-					interval: donor.onset + epiParameters.serialInterval(),
+					interval: epiParameters.serialInterval(),
 					genome: donor.genome,
 				};
 				child.onset = donor.onset + child.interval;
@@ -378,7 +378,7 @@ export class Outbreak {
 					const newInternal = {
 						parent: currentParentPhyloNode,
 						children: [],
-						length: child.interval - this.tree.rootToTipLength(currentParentPhyloNode),
+						length: child.onset - this.tree.rootToTipLength(currentParentPhyloNode),
 					};
 					// link currentParentPhyloNode to newInternal
 					currentParentPhyloNode.children.push(newInternal);
