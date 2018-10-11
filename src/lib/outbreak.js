@@ -363,9 +363,18 @@ export class Outbreak {
 
 			let currentParentPhyloNode = currentPhyloNode.parent ? currentPhyloNode.parent : this.tree.rootNode;
 
-			if (currentParentPhyloNode === this.tree.rootNode) {
-				// add the child
+			if (node === startNode) {
+				// add the child and the fist child.
 				currentParentPhyloNode.children = [currentPhyloNode];
+				const firstChild = node.children.sort((a, b) => a.interval - b.interval).shift()
+				// remove it so it doesn't get used later
+				const childPhyloNode = {
+					parent: currentParentPhyloNode,
+					length: this.sampleTime,
+					name: firstChild.Id,
+				};
+				currentParentPhyloNode.children.push(childPhyloNode)
+
 			}
 			// else it should already be there since we're using prexisting nodes
 			if (node.children && node.children.length > 0) {
