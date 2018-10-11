@@ -8,7 +8,7 @@ import NumberofTransmissions from './NumberofTransmissions';
 import TransmissionNetworkTree from './TransmissionFixedNetwork';
 import Phylotree from './PhyloTree';
 import LineList from './LineList';
-// import EpidemicContainer from './EpidemicContainer';
+import EpidemicContainer from './EpidemicContainer';
 import { pdfFunctions, sampleDistribution, NegBinSample, meanFunctions } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
@@ -199,12 +199,7 @@ class App extends Component {
 							<div>
 								<h2> Characteristics</h2>
 							</div>
-							<EpidemicContainer
-								Outbreak={this.state.transmissionTree}
-								size={TwobigPlot}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								time={this.state.time}
-							/>
+							
 							<Clockyness
 								size={TwobigPlot}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
@@ -216,6 +211,12 @@ class App extends Component {
 				</div> */}
 						<div>
 							<div className="inner">
+								<EpidemicContainer
+									Outbreak={this.state.transmissionTree}
+									size={TwobigPlot}
+									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+									time={this.state.time}
+								/>
 								<h1>Transmission tree</h1>
 								<p>{this.state.transmissionTree.transmissionToNewick()}</p>
 								<TransmissionNetworkTree
