@@ -1,6 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import { drawAxis } from '../lib/commonFunctions';
+import '../style/plots.css';
 
 class SelectedTransmissionNetwork extends React.Component {
 	constructor(props) {
@@ -133,7 +134,11 @@ class SelectedTransmissionNetwork extends React.Component {
 			.attr('r', 5)
 			.style('stroke-width', 2)
 			.style('stroke', 'black')
-			.style('fill', d => (this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1 ? 'black' : 'white'));
+			.style('fill', d => (this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1 ? 'black' : 'white'))
+			.append('title')
+			.text(function(d) {
+				return d.Id;
+			});
 		//.attr('fill-opacity', d => (this.props.selectedCases.map(c => c.Id).indexOf(d.Id) > -1 ? 1 : 0.1));
 
 		drawAxis(

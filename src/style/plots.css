@@ -31,3 +31,18 @@
 	stroke: red;
 	stroke-width: 3px;
 }
+
+div.tooltip {
+	color: black;
+	position: absolute;
+	text-align: left;
+	width: auto;
+	height: auto;
+	padding: 5px;
+	font-family: Futura;
+	font: 12px sans-serif;
+	background: rgba(206, 206, 206, 0.897);
+	border: 0px;
+	border-radius: 8px;
+	pointer-events: none;
+}

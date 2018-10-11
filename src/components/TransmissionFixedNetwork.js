@@ -1,6 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import { drawAxis } from '../lib/commonFunctions';
+import '../style/plots.css';
 
 class TransmissionNetworkTree extends React.Component {
 	constructor(props) {
@@ -110,7 +111,6 @@ class TransmissionNetworkTree extends React.Component {
 			})
 			.on('click', (d, i) => this.props.zoomToNode(d.target));
 
-		svgGroup.on('dbclick', (d, i) => this.props.zoomToNode(this.props.Outbreak.indexCase));
 		//Create nodes as circles
 		svgGroup
 			.selectAll('circle')
@@ -130,7 +130,11 @@ class TransmissionNetworkTree extends React.Component {
 				return color;
 			})
 
-			.on('click', d => this.props.selectSample(d));
+			.on('click', d => this.props.selectSample(d))
+			.append('title')
+			.text(function(d) {
+				return d.Id;
+			});
 
 		drawAxis(
 			svgGroup,
