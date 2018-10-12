@@ -234,7 +234,7 @@ class App extends Component {
 							</div>
 						</div>
 						<div className="inner">
-							<h1>Phylogentic time tree</h1>
+							<h1>Time tree</h1>
 
 							<Phylotree
 								size={[w * 0.9, h * 0.9]}
