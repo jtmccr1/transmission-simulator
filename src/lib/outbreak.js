@@ -344,7 +344,7 @@ export class Outbreak {
 				length:
 					node.children && node.children.length > 0
 						? this.sampleTime + node.children.reduce((acc, curr) => Math.max(acc, curr.interval), 0)
-						: this.sampleTime,
+						: this.epiParameters.serialInterval(),
 				name: node.Id,
 			};
 			// check if there is phylogenetic node for this sample
@@ -390,7 +390,7 @@ export class Outbreak {
 					//make transmissionchild
 					const childPhyloNode = {
 						parent: newInternal,
-						length: this.sampleTime,
+						length: this.epiParameters.serialInterval(),
 						name: child.Id,
 					};
 					// add to newInternal children
