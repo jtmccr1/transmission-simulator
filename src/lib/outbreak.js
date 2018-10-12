@@ -5,7 +5,6 @@
  * the future. That'd be nice.
  */
 const Tree = require('./figtree.js').Tree;
-const jStat = require('jStat');
 export class Outbreak {
 	/**
 	 * The constructor takes a config object containing a starting seed for the outbreak,
@@ -33,7 +32,7 @@ export class Outbreak {
 		this.time = 0;
 		this.caseList = this.broadSearch();
 		//this.caseList.forEach((n, index) => (n.key = Symbol.for(`case ${index}`)));
-		this.caseList.sort((a, b) => a.onset - b.onset).forEach((n, index) => (n.Id = `case ${index}`));
+		this.caseList.sort((a, b) => a.onset - b.onset).forEach((n, index) => (n.Id = `case${index}`));
 		//this.caseMap = new Map(this.caseList.map(node => [node.key, node]));
 		this.AllCases = [...this.postorderAll()];
 	}
@@ -363,18 +362,15 @@ export class Outbreak {
 
 			let currentParentPhyloNode = currentPhyloNode.parent ? currentPhyloNode.parent : this.tree.rootNode;
 
-			if (node === startNode) {
-				// add the child and the fist child.
+			if (currentParentPhyloNode === this.tree.rootNode) {
+				// add the child
 				currentParentPhyloNode.children = [currentPhyloNode];
-				const firstChild = node.children.sort((a, b) => a.interval - b.interval).shift()
-				// remove it so it doesn't get used later
-				const childPhyloNode = {
-					parent: currentParentPhyloNode,
-					length: this.sampleTime,
-					name: firstChild.Id,
+				// add infecting strain node here so that times are consistent
+				const initialInfecting = {
+					length: 0,
+					name: 'InitialInfection',
 				};
-				currentParentPhyloNode.children.push(childPhyloNode)
-
+				currentParentPhyloNode.children.push(initialInfecting);
 			}
 			// else it should already be there since we're using prexisting nodes
 			if (node.children && node.children.length > 0) {

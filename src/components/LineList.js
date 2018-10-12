@@ -16,13 +16,19 @@ class LineList extends Component {
 		const displayNodes = this.props.Outbreak.broadSearch(this.props.zoomNode);
 		const allData = this.props.Outbreak.caseList.filter(d => d.onset <= this.props.time);
 		const processedData = allData.filter(d => displayNodes.map(e => e.Id).indexOf(d.Id) > -1);
+		const that = this;
 		const dataSet = processedData //add an id for each node then get the parent and children id lists
 			.map(node => {
 				node.onset = Number(node.onset.toFixed(2));
 				return node;
 			})
 			.map(node => {
-				node.mutationsFromRoot = this.props.Outbreak.rootToTipMutations(node);
+				if (that.props.Outbreak.tree.nodeList.length > 1) {
+					const PhyloNode = that.props.Outbreak.tree.nodeList.filter(x => x.name === node.Id)[0];
+					node.sampleTime = that.props.Outbreak.tree.rootToTipLength(PhyloNode);
+				} else {
+					node.sampleTime = 'NA';
+				}
 				return node;
 			})
 			.map(node => {
@@ -61,6 +67,9 @@ class LineList extends Component {
 					</TableHeaderColumn>
 					<TableHeaderColumn dataField="onset" dataSort width="100" {...textColumn}>
 						Onset
+					</TableHeaderColumn>
+					<TableHeaderColumn dataField="sampleTime" dataSort width="200" {...textColumn}>
+						Day of Sampling
 					</TableHeaderColumn>
 					<TableHeaderColumn dataField="parentId" dataSort width="200" {...textColumn}>
 						Donor Contact
