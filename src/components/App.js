@@ -3,25 +3,16 @@ import seedrandom from 'seedrandom';
 import Selectors from './Selectors';
 import SerialInterval from './SerialInterval';
 import NumberofTransmissions from './NumberofTransmissions';
-// import SerialIntervalTest from './SerialIntervalTest';
-// import NumberofTransmissionsTest from './NumberofTransmissionsTest';
-import TransmissionNetworkTree from './TransmissionFixedNetwork';
-import Phylotree from './PhyloTree';
-import LineList from './LineList';
-import EpidemicContainer from './EpidemicContainer';
+
 import { pdfFunctions, sampleDistribution, NegBinSample, meanFunctions } from '../lib/commonFunctions';
 import '../style/App.css';
 import '../style/plots.css';
 import { Outbreak } from '../lib/outbreak.js';
 // import Clockyness from './ClockPlot';
-import SelectedTransmissionNetwork from './SelectedTransmissionTree';
-
+import TransmissionPanels from './TransmissionPanels';
 //https://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript
 const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-const genome =
-	'GCGCGAACCATTTGCAACGAAACCTGGCAACGCAAGTGGCAACGAAAGTCGCACCAGCCAGTTATAAGGGTATCGGTTGCGCTCCCTCACGCCTGAGCTATGCCTTTAATATGCCAGAATCAAAACGAGTGAGCTAATGACCGAGAAGTAGTGCGGGCGATGTAGGCGGTGACCTGAAACATTTGCAAACTTCAGATGGCTAATTAGATCGCTAATGGCCAACAGGACTTTGAGCTCCTGCAGGTTGTCTAGATCGAAAATAATGGCGCTCGTGACTATTAACTTGTGAAGGAGATGGAGAGGGAGGATATTACGCATTGATAAATCCAGTCACACTGACAAGTAATTTGCAAGTGAAAGATCAGGTCGACTTATAACTGACGGGTTAATAAAGAACGGATAGCGATGGAGTCTCACGCAGACTTTATTGAGTTAGATTAGGTTGAGAGAATTACCTACCATATACTTCTATAGGCAATCAATGAATGACAAACTCAGCAACTTGAATGAGCTCGTACAATATGTAATGAGACATGGCAACGCAAATGGCAGCGTAAAAGTCACCAACCTGTAATACGAGTATCAGTAGCGCTTCCACACGCATAAGCTATGCCACTAATTTGCCAAAACACGGTTGTGCAATAAGGCGTTTATTAAGCCGAACTGGAGTGAACTCGCGAGGTCCAACGTTAAGAGGATTTTCAGCGCGATTGAGGCTATACCATTAGCGACGTAGATGCCTCATAGAATGTCAACCAATTCGCCCGTATAGCCTAATGATGTCATCGCATTAGCACGCAGCCGCATGAATTCCGCGCGAGCGAGCGTTAAATGGCTAACGACGAGGTAGGCATTTTACTGTAGAAAGCTACAATAGAACATGCCATGCCCTCACAGAATTAACTCATTGCCAATGCGAAGGCGTTTGAGACCTAGCAACCCCAGGTCCTGCAGGTCTAGCCACACATCTTAATTCCACCCGAGCTAGAGATGGAATATTGAATTACGATGTGTTGTAGGCAAAATGAGTAGCAATTAATCGTTGAGCGCCCGTATTGAGTTTCTTAGATGGCAAGGTGCTCGGTTTGTCACGCCCGAGATTAAGCGAGGACAATCTGCAATGAGACTTGGCAAAGAAAATGGCAGCGCAAGAGTCACCAACCGGTGATTCGCGTGTCTGTGGCGCTACCACACGCCTAAGCCATGCCGCTGATATGTCAGAACTTTCAGGTAAGATAGACTCACGAGTGGGAACTCTTGTGCCAGATGGAAACGAGAGTGTCTACGTAGTGTCAGCTCTTGGCATAGCAAAGGGCTACCCAGCGGTCTGCCGTAGTAGCTAGAGATTAGAGAGAAGCCCTAACGATCATGGAGGTAATTAGAGTGTCTGGAGAGAATCAGATGGAGTCTGAACAGGTTGAAAATTGCATCAATGGATTCCAGAGGGAACCCATAGATGAGATGATTTGCTCTTAGGGACGAGCCAATACATAGACAGTGGTCCAACAGCATAGCATAAAATCTACGGTCGTACAGAACATCAATGAGGAAATCGGGCATACCTCACTGGCCAGTCATTCGGAAGACTCGTTAGCAAGCCACTCAGAGGTAGAAAATACCGAGGAAAATTCGGAGGACTAGGCACGTACCATTTGCAATGAGACCTGGCAGAGAAAATGGCAAAGGAAAAGTCATCAACCGGTAATACGAGTGTCGGTCGCTTTGCCTCACGCATAGGCTATGCCCTTAATATGTCAAAACACCCATAGGGAAGAATGAAATGAGGGGAGACAAAATATATGACAAAATGAGCCAGCCCGCACCGGAATCAATTAACAGAACGAACCCGCGAGAACCTGTGCAATGCCAGCCAGGATATAGCAAAACGAACCAGCGCGCACATCGGTCGTTGAGGAGACCGTTGAGCGGATGCAAGTCACTCATTGATCTACTATACGGCAAGTCGAGAGAATATGCGAATAGTCGACGAGGGCAATAAACATTAATACTCAGCGTCAATGTAAGTCAGGACTAGCATCTAGTTGACTAGCCCGCGGAGAGATATGCGAATAGCAGAGGGCTAACGGGGAGCCGGAAGAACTGGGAGCCCGCAATATCTCTCATTAAGCACGTACGATATGCAATGAAACCTGGCAGCGAAAATGGCAGCGTAAGTCACATCAACCGGTCATACGGGTTAGTGTAGCCCTACCCCATGCCTAGGCAATGCCCTTAATCTGTCAAAATTTCATTGTCGAATAAACTCATGCAAACAAGTCTACTCAATAGCAGAAGAGTTTCCAAAGAGATAATGCCAACCAGCCCCAACGTGAGACGGAGTGTCATAATCAGTTACAAGGTATTGAATCCTGACCATGCAGACAAGAGCCAATGTTCAGATGGATGAGATTCTCAGATCTGAGCACGTGGGAGGGCGATCGCAATCTGGCTCCCAGTTTTGTGAATGAAGATGGCGTCGACCATGCCGTTAAGCCCTAGCAAATCCGGCACGAACGATCGATGGGGAGTAAGCGACTTAACTGATTAATACTCAGAATTGAACCAGGGCCGTTGAACTATAAACCGCAGTCGAGCGAAACTGAGCACGCACAATCTGTAATGAAACATGGCAGAGAAAGTGGCAACGCAAGTCTCACCAGCCGGTGATTCGCGTCTCTGTTGCGTTACCGCATGCTTAGGCGATGCCTCTCATCTGCCAGAATAGCATTAAATCGTAGGTTCGATTGGCAATAACCTGTCATACAGAAGAGACAGAAGAGCCTGAAGAATGTCAACTACAAAATAGTCTCGCGTCCCACTCCCTAGCGTCCCACGCCAGGACGATTTGTGACCAGACGAATGAGACCTGGCAGCGCAAGTCACTCGCATCTCATTAGACTGTCGTCATTACAACAGAAAGAGCCACCAATGAGACCGTCGTTCAGCGAAAAGCTCGGACTATCTGCTGAGCCCGAACGATATGCAACGAGACTTGGCAACGCAAGTGGCAGCGAAAAAGCCATCAACCAGTGATCCGAGTGTCGGTGGCTCTCCCTCACGCG';
 
 const TwobigPlot = [w * 0.4, h * 0.5];
 class App extends Component {
@@ -30,9 +21,6 @@ class App extends Component {
 		this.updateOnSelection = this.updateOnSelection.bind(this);
 		this.updateOutbreak = this.updateOutbreak.bind(this);
 		this.reset = this.reset.bind(this);
-		this.selectSample = this.selectSample.bind(this);
-		this.zoomToNode = this.zoomToNode.bind(this);
-		this.resetZoom = this.resetZoom.bind(this);
 		this.state = {
 			distributionOptions: ['Gamma', 'LogNormal'],
 			distributionSelection: 'Gamma',
@@ -42,31 +30,9 @@ class App extends Component {
 			transmissionParameters: [2.9, 0.38],
 			randomSeed: 10,
 			addDays: 100,
-			transmissionTree: new Outbreak(),
+			Outbreak: new Outbreak(),
 			time: 0,
-			cases: [],
-			selectedCases: [],
 		};
-		this.setState({
-			zoomNode: this.state.transmissionTree.indexCase,
-		});
-	}
-	selectSample(node) {
-		const selectedCases = this.state.selectedCases;
-		if (selectedCases.map(n => n.Id).indexOf(node.Id) > -1) {
-			//remove it
-			const newSelectedCases = selectedCases.filter(x => x !== node);
-			this.setState({ selectedCases: newSelectedCases });
-		} else {
-			//add it
-
-			selectedCases.push(node);
-			this.setState({ selectedCases: selectedCases });
-		}
-	}
-
-	zoomToNode(node) {
-		this.setState({ zoomNode: node });
 	}
 
 	updateOnSelection(key, index, event, numeric = true) {
@@ -84,10 +50,10 @@ class App extends Component {
 
 	updateOutbreak() {
 		// set random seed if this is the first call
-		if ((this.state.transmissionTree.caseList.length === 1) & !this.state.transmissionTree.index.children) {
+		if ((this.state.Outbreak.caseList.length === 1) & !this.state.Outbreak.index.children) {
 			seedrandom(this.state.randomSeed, { global: true });
 		}
-		let activeInfections = this.state.transmissionTree.caseList.filter(x => !x.children).length;
+		let activeInfections = this.state.Outbreak.caseList.filter(x => !x.children).length;
 
 		if (activeInfections > 500) {
 			alert('Reacted maximum number of active infections (500)');
@@ -95,7 +61,7 @@ class App extends Component {
 			//const R = sampleDistribution[this.state.transmissionSelection];
 			const R = NegBinSample;
 			const serialInterval = sampleDistribution[this.state.distributionSelection];
-			const newTree = this.state.transmissionTree;
+			const newTree = this.state.Outbreak;
 
 			newTree.epiParams = {
 				R0: () => R(...this.state.transmissionParameters),
@@ -111,7 +77,7 @@ class App extends Component {
 				needSpread = newTree.caseList.filter(node => (node.onset < targetTime) & !node.futureChildren);
 			}
 			this.setState({
-				transmissionTree: newTree,
+				Outbreak: newTree,
 				time: targetTime,
 				cases: newTree.caseList.filter(x => x.onset <= targetTime),
 			});
@@ -120,15 +86,10 @@ class App extends Component {
 			}
 		}
 	}
-	resetZoom() {
-		this.setState({
-			zoomNode: this.state.transmissionTree.indexCase,
-		});
-	}
 	reset() {
-		this.setState({ transmissionTree: new Outbreak(), time: 0, cases: [], selectedCases: [] });
+		this.setState({ Outbreak: new Outbreak(), time: 0, cases: [], selectedCases: [] });
 		this.setState({
-			zoomNode: this.state.transmissionTree.indexCase,
+			zoomNode: this.state.Outbreak.indexCase,
 		});
 	}
 
@@ -150,7 +111,6 @@ class App extends Component {
 							addDays={this.state.addDays}
 							buttonAction={this.updateOutbreak}
 							reset={this.reset}
-							data={this.state.cases}
 							time={this.state.time}
 						/>
 					</div>
@@ -172,118 +132,8 @@ class App extends Component {
 						/>
 					</div>
 				</div>
-				{this.state.transmissionTree.caseList.length > 1 ? (
-					<div>
-						{/* <div className="container">
-							<div>
-								<h2>Empirical parameters</h2>
-							</div>
-							<div>
-								<SerialIntervalTest
-									size={TwobigPlot}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-									Outbreak={this.state.transmissionTree}
-									time={this.state.time}
-								/>
-							</div>
-							<div>
-								<NumberofTransmissionsTest
-									size={TwobigPlot}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-									Outbreak={this.state.transmissionTree}
-									time={this.state.time}
-								/>
-							</div>
-						</div>
-						<div className="container">
-							<div>
-								<h2> Characteristics</h2>
-							</div>
-							
-							<Clockyness
-								size={TwobigPlot}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								Outbreak={this.state.transmissionTree}
-								time={this.state.time}
-								selectedCases={this.state.selectedCases}
-								selectSample={this.selectSample}
-							/>
-				</div> */}
-						<div>
-							<div className="inner">
-								<EpidemicContainer
-									Outbreak={this.state.transmissionTree}
-									size={TwobigPlot}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-									time={this.state.time}
-								/>
-								<h1>Transmission tree</h1>
-								<p>{this.state.transmissionTree.transmissionToNewick()}</p>
-								<TransmissionNetworkTree
-									size={[w * 0.9, h * 0.9]}
-									data={this.state.cases}
-									Outbreak={this.state.transmissionTree}
-									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-									selectedCases={this.state.selectedCases}
-									selectSample={this.selectSample}
-									time={this.state.time}
-									zoomNode={this.state.zoomNode}
-									zoomToNode={this.zoomToNode}
-									resetZoom={this.resetZoom}
-								/>
-							</div>
-						</div>
-						<div className="inner">
-							<h1>Time tree</h1>
-
-							<Phylotree
-								size={[w * 0.9, h * 0.9]}
-								Outbreak={this.state.transmissionTree}
-								margin={{ top: 50, right: 75, bottom: 50, left: 50 }}
-								selectedCases={this.state.selectedCases}
-								selectSample={this.selectSample}
-							/>
-						</div>
-					</div>
-				) : (
-					<div />
-				)}
-				{this.state.selectedCases.length > 1 ? (
-					<div className="container">
-						<div>
-							<h3>Selected samples</h3>
-						</div>
-						<div>
-							<SelectedTransmissionNetwork
-								size={TwobigPlot}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								Outbreak={this.state.transmissionTree}
-								selectedCases={this.state.selectedCases}
-								time={this.state.time}
-							/>
-						</div>
-						{/*<div>
-							<SelectedPhyloTree
-								size={TwobigPlot}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								Outbreak={this.state.transmissionTree}
-								selectedCases={this.state.selectedCases}
-								time={this.state.time}
-							/>
-						</div>*/}
-					</div>
-				) : (
-					<div />
-				)}
-
-				<div className="inner">
-					<LineList
-						Outbreak={this.state.transmissionTree}
-						selectSample={this.selectSample}
-						selectedCases={this.state.selectedCases}
-						time={this.state.time}
-						zoomNode={this.state.zoomNode}
-					/>
+				<div>
+					<TransmissionPanels Outbreak={this.state.Outbreak} time={this.state.time} />
 				</div>
 			</div>
 		);

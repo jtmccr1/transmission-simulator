@@ -149,8 +149,8 @@ const Selectors = props => {
 		<Sliderselector {...x} key={i} />
 	));
 
-	const activeInfections = props.data.filter(x => !x.futureChildren || x.futureChildren.length>0).length;
-	const status = activeInfections === 0 ? 'Ended' : 'On going';
+	//const activeInfections = props.data.filter(x => !x.futureChildren || x.futureChildren.length>0).length;
+	//const status = activeInfections === 0 ? 'Ended' : 'On going';
 
 	return (
 		<div>
@@ -183,8 +183,6 @@ const Selectors = props => {
 			</div>
 			<button onClick={props.buttonAction}>Run Outbreak</button>
 			<button onClick={props.reset}>Reset</button>
-			<h4>{`Status: ${status} (${props.time} days)`}</h4>
-			<h4>{`Cases: ${props.data.length} (${activeInfections} active cases)`}</h4>
 		</div>
 	);
 };
