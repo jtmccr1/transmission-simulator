@@ -43,7 +43,7 @@ class TransmissionPanels extends Component {
 
 	resetZoom() {
 		this.setState({
-			zoomNode: this.props.Oubreak.indexCase,
+			zoomNode: this.props.Outbreak.indexCase,
 		});
 	}
 	render() {
@@ -54,20 +54,20 @@ class TransmissionPanels extends Component {
 						<div>
 							<div className="inner">
 								<EpidemicContainer
-									Outbreak={this.props.Oubreak}
+									Outbreak={this.props.Outbreak}
 									size={TwobigPlot}
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-									time={this.state.time}
+									time={this.props.time}
 								/>
 								<h1>Transmission tree</h1>
-								<p>{this.props.Oubreak.transmissionToNewick()}</p>
+								<p>{this.props.Outbreak.transmissionToNewick()}</p>
 								<TransmissionNetworkTree
 									size={[w * 0.9, h * 0.9]}
-									Outbreak={this.props.Oubreak}
+									Outbreak={this.props.Outbreak}
 									margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
 									selectedCases={this.state.selectedCases}
 									selectSample={this.selectSample}
-									time={this.state.time}
+									time={this.props.time}
 									zoomNode={this.state.zoomNode}
 									zoomToNode={this.zoomToNode}
 									resetZoom={this.resetZoom}
@@ -79,10 +79,11 @@ class TransmissionPanels extends Component {
 
 							<Phylotree
 								size={[w * 0.9, h * 0.9]}
-								Outbreak={this.props.Oubreak}
+								Outbreak={this.props.Outbreak}
 								margin={{ top: 50, right: 75, bottom: 50, left: 50 }}
 								selectedCases={this.state.selectedCases}
 								selectSample={this.selectSample}
+							time={this.props.time}
 							/>
 						</div>
 					</div>
@@ -98,16 +99,16 @@ class TransmissionPanels extends Component {
 							<SelectedTransmissionNetwork
 								size={TwobigPlot}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								Outbreak={this.props.Oubreak}
+								Outbreak={this.props.Outbreak}
 								selectedCases={this.state.selectedCases}
-								time={this.state.time}
+								time={this.props.time}
 							/>
 						</div>
 						{/*<div>
 							<SelectedPhyloTree
 								size={TwobigPlot}
 								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								Outbreak={this.props.Oubreak}
+								Outbreak={this.props.Outbreak}
 								selectedCases={this.state.selectedCases}
 								time={this.state.time}
 							/>
@@ -119,10 +120,10 @@ class TransmissionPanels extends Component {
 
 				<div className="inner">
 					<LineList
-						Outbreak={this.props.Oubreak}
+						Outbreak={this.props.Outbreak}
 						selectSample={this.selectSample}
 						selectedCases={this.state.selectedCases}
-						time={this.state.time}
+						time={this.props.time}
 						zoomNode={this.state.zoomNode}
 					/>
 				</div>

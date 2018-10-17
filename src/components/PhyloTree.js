@@ -12,6 +12,10 @@ class Phylotree extends React.Component {
 	componentDidUpdate() {
 		this.drawTree();
 	}
+	shouldComponentUpdate(nextProps){
+		const timeChange = nextProps.time!==this.props.time
+		return timeChange
+	}
 	drawTree() {
 		const node = this.node;
 		const svg = d3.select(node).style('font', '10px sans-serif');

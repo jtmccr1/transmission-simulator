@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import seedrandom from 'seedrandom';
-import Selectors from './Selectors';
-import SerialInterval from './SerialInterval';
-import NumberofTransmissions from './NumberofTransmissions';
+import SelectionPanels from "./SelectionPanels"
 
 import { pdfFunctions, sampleDistribution, NegBinSample, meanFunctions } from '../lib/commonFunctions';
 import '../style/App.css';
@@ -96,9 +94,8 @@ class App extends Component {
 	render() {
 		return (
 			<div>
-				<div className="container">
 					<div>
-						<Selectors
+						<SelectionPanels
 							updater={this.updateOnSelection}
 							options={this.state.conditionalOptions}
 							distributionOptions={this.state.distributionOptions}
@@ -114,24 +111,7 @@ class App extends Component {
 							time={this.state.time}
 						/>
 					</div>
-					<div>
-						<SerialInterval
-							size={TwobigPlot}
-							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-							params={this.state.distributionParameters}
-							pdf={pdfFunctions[this.state.distributionSelection]}
-							mean={meanFunctions[this.state.distributionSelection]}
-						/>
-					</div>
-					<div>
-						<NumberofTransmissions
-							size={TwobigPlot}
-							margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-							params={this.state.transmissionParameters}
-							pdf={pdfFunctions[this.state.transmissionSelection]}
-						/>
-					</div>
-				</div>
+					
 				<div>
 					<TransmissionPanels Outbreak={this.state.Outbreak} time={this.state.time} />
 				</div>

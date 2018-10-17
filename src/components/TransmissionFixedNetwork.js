@@ -7,12 +7,15 @@ class TransmissionNetworkTree extends React.Component {
 	constructor(props) {
 		super(props);
 		this.drawTransPlot = this.drawTransPlot.bind(this);
+		this.highlightNodes =this.highlightNodes.bind(this)
 	}
 	componentDidMount() {
 		this.drawTransPlot();
+		this.highlightNodes();
 	}
 	componentDidUpdate() {
 		this.drawTransPlot();
+		this.highlightNodes();
 	}
 
 	drawTransPlot() {
@@ -125,10 +128,7 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
 			.style('stroke-width', 2)
-			.style('stroke', d => {
-				const color = this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1 ? 'red' : 'black';
-				return color;
-			})
+			
 
 			.on('click', d => this.props.selectSample(d))
 			.append('title')
@@ -146,6 +146,19 @@ class TransmissionNetworkTree extends React.Component {
 			''
 		);
 		svgGroup.select('.y').remove();
+	}
+
+	highlightNodes(){
+		const node = this.node;
+		const svg = d3.select(node).style('font', '10px sans-serif');
+		const svgGroup = svg.select('g');
+
+		svgGroup
+		.selectAll('circle')
+		.style('stroke', d => {
+			const color = this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1 ? 'red' : 'black';
+			return color;
+		})
 	}
 
 	render() {
