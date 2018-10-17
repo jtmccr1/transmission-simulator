@@ -83,7 +83,7 @@ class TransmissionPanels extends Component {
 								margin={{ top: 50, right: 75, bottom: 50, left: 50 }}
 								selectedCases={this.state.selectedCases}
 								selectSample={this.selectSample}
-							time={this.props.time}
+								time={this.props.time}
 							/>
 						</div>
 					</div>
@@ -104,15 +104,6 @@ class TransmissionPanels extends Component {
 								time={this.props.time}
 							/>
 						</div>
-						{/*<div>
-							<SelectedPhyloTree
-								size={TwobigPlot}
-								margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
-								Outbreak={this.props.Outbreak}
-								selectedCases={this.state.selectedCases}
-								time={this.state.time}
-							/>
-						</div>*/}
 					</div>
 				) : (
 					<div />

@@ -7,15 +7,30 @@ class TransmissionNetworkTree extends React.Component {
 	constructor(props) {
 		super(props);
 		this.drawTransPlot = this.drawTransPlot.bind(this);
-		this.highlightNodes =this.highlightNodes.bind(this)
+		this.highlightNodes = this.highlightNodes.bind(this);
+		this.state = {
+			currentZoomNode: '',
+			currentOutbreaklength: -1,
+		};
 	}
 	componentDidMount() {
 		this.drawTransPlot();
 		this.highlightNodes();
 	}
 	componentDidUpdate() {
-		this.drawTransPlot();
-		this.highlightNodes();
+		if (
+			this.state.currentZoomNode !== this.props.zoomNode ||
+			this.state.currentOutbreaklength !== this.props.Outbreak.caseList.length
+		) {
+			this.drawTransPlot();
+			this.highlightNodes();
+			this.setState({
+				currentZoomNode: this.props.zoomNode,
+				currentOutbreaklength: this.props.Outbreak.caseList.length,
+			});
+		} else {
+			this.highlightNodes();
+		}
 	}
 
 	drawTransPlot() {
@@ -128,7 +143,6 @@ class TransmissionNetworkTree extends React.Component {
 			.attr('cy', d => yScale(d.y))
 			.attr('r', 5)
 			.style('stroke-width', 2)
-			
 
 			.on('click', d => this.props.selectSample(d))
 			.append('title')
@@ -148,17 +162,15 @@ class TransmissionNetworkTree extends React.Component {
 		svgGroup.select('.y').remove();
 	}
 
-	highlightNodes(){
+	highlightNodes() {
 		const node = this.node;
 		const svg = d3.select(node).style('font', '10px sans-serif');
 		const svgGroup = svg.select('g');
 
-		svgGroup
-		.selectAll('circle')
-		.style('stroke', d => {
+		svgGroup.selectAll('circle').style('stroke', d => {
 			const color = this.props.selectedCases.map(n => n.Id).indexOf(d.Id) > -1 ? 'red' : 'black';
 			return color;
-		})
+		});
 	}
 
 	render() {

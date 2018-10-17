@@ -1,7 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import regression from 'regression';
-import { drawAxis } from '../lib/commonFunctions';
+import { drawAxis } from '../../lib/commonFunctions';
 
 class Clockyness extends React.Component {
 	constructor(props) {
